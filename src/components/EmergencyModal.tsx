@@ -200,19 +200,59 @@ export const EmergencyModal: React.FC = () => {
               </button>
             </div>
 
-            {/* If Dispatched Status */}
+            {/* If Dispatched Status with Live Stepper */}
             {dispatchInfo && (
-              <div className="mt-4 pt-3 border-t border-slate-700/60 text-xs bg-slate-800/80 p-3 rounded-lg">
-                <div className="flex items-center justify-between font-semibold text-emerald-400 mb-1">
-                  <span>Ambulance En Route (ETA: {dispatchInfo.dispatchedAmbulance.etaMinutes} mins)</span>
+              <div className="mt-4 pt-3 border-t border-slate-700/60 text-xs bg-slate-800/80 p-3.5 rounded-xl space-y-3">
+                {/* Stepper */}
+                <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-bold">
+                  <div className="p-2 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800">
+                    <span className="block text-emerald-400">✓ Step 1</span>
+                    SOS Acknowledged
+                  </div>
+                  <div className="p-2 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800">
+                    <span className="block text-emerald-400">✓ Step 2</span>
+                    Ambulance Assigned
+                  </div>
+                  <div className="p-2 rounded-lg bg-sky-950 text-sky-300 border border-sky-800 animate-pulse">
+                    <span className="block text-sky-400">● Step 3</span>
+                    En-Route (Live GPS)
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between font-semibold text-emerald-400">
+                  <span className="text-xs">Ambulance ETA: ~6 mins (Patrol moving towards you)</span>
                   <span>Vehicle: {dispatchInfo.dispatchedAmbulance.vehicleNumber}</span>
                 </div>
                 <p className="text-slate-300">
                   Driver: {dispatchInfo.dispatchedAmbulance.driverName} ({dispatchInfo.dispatchedAmbulance.driverPhone}) · {dispatchInfo.dispatchedAmbulance.type}
                 </p>
-                <p className="text-slate-400 text-[11px] mt-1">
-                  ✓ SMS notifications sent with your location link to {dispatchInfo.notifiedContacts.length} emergency contacts.
-                </p>
+
+                {/* Web Share Button */}
+                <div className="pt-2 border-t border-slate-700 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-400">
+                    ✓ SMS location broadcast sent to {dispatchInfo.notifiedContacts.length} emergency contacts.
+                  </span>
+                  
+                  <button
+                    onClick={() => {
+                      const alertText = `URGENT: Medical emergency SOS raised on Sanjeevani Platform for ${user?.fullName}. Location: ${user?.location.address || 'Connaught Place, New Delhi'}. 108 Ambulance dispatched.`;
+                      const nav = typeof navigator !== 'undefined' ? (navigator as any) : null;
+                      if (nav && nav.share) {
+                        nav.share({
+                          title: '🚨 MEDICAL EMERGENCY SOS',
+                          text: alertText,
+                          url: window.location.href,
+                        }).catch(() => {});
+                      } else if (nav && nav.clipboard) {
+                        nav.clipboard.writeText(alertText);
+                        alert('Emergency broadcast message copied to clipboard. Paste into WhatsApp or SMS.');
+                      }
+                    }}
+                    className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-[11px] rounded-lg transition cursor-pointer"
+                  >
+                    Share Live SOS with Family
+                  </button>
+                </div>
               </div>
             )}
           </div>

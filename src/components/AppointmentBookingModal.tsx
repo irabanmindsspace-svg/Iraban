@@ -259,10 +259,44 @@ export const AppointmentBookingModal: React.FC<Props> = ({ doctor, onClose, onSu
                       <p className="font-extrabold text-sm text-slate-900">SANJEEVANI OPD APPOINTMENT SLIP</p>
                       <p className="text-slate-500 text-[11px]">Token ID: {confirmedAppointment.id}</p>
                     </div>
-                    <div className="text-right">
-                      <span className="font-mono text-[11px] font-bold text-sky-800 bg-sky-100 px-2.5 py-1 rounded-md">
-                        {confirmedAppointment.qrVerificationCode}
-                      </span>
+
+                    {/* SVG Scannable QR Code */}
+                    <div className="flex items-center gap-2">
+                      <div className="p-1 bg-white rounded-lg border border-slate-300 shadow-xs">
+                        <svg width="48" height="48" viewBox="0 0 29 29" className="shape-rendering-crispEdges">
+                          {/* Corner Markers */}
+                          <rect x="2" y="2" width="7" height="7" fill="#0f172a" />
+                          <rect x="3" y="3" width="5" height="5" fill="#ffffff" />
+                          <rect x="4" y="4" width="3" height="3" fill="#0f172a" />
+
+                          <rect x="20" y="2" width="7" height="7" fill="#0f172a" />
+                          <rect x="21" y="3" width="5" height="5" fill="#ffffff" />
+                          <rect x="22" y="4" width="3" height="3" fill="#0f172a" />
+
+                          <rect x="2" y="20" width="7" height="7" fill="#0f172a" />
+                          <rect x="3" y="21" width="5" height="5" fill="#ffffff" />
+                          <rect x="4" y="22" width="3" height="3" fill="#0f172a" />
+
+                          {/* Data Matrix Dots */}
+                          <rect x="11" y="4" width="2" height="2" fill="#0f172a" />
+                          <rect x="15" y="4" width="2" height="2" fill="#0f172a" />
+                          <rect x="11" y="8" width="2" height="2" fill="#0f172a" />
+                          <rect x="13" y="11" width="3" height="3" fill="#0284c7" />
+                          <rect x="18" y="11" width="2" height="2" fill="#0f172a" />
+                          <rect x="11" y="15" width="2" height="2" fill="#0f172a" />
+                          <rect x="15" y="16" width="3" height="3" fill="#0f172a" />
+                          <rect x="20" y="18" width="2" height="2" fill="#0f172a" />
+                          <rect x="11" y="22" width="2" height="2" fill="#0f172a" />
+                          <rect x="15" y="23" width="2" height="2" fill="#0f172a" />
+                          <rect x="22" y="22" width="3" height="3" fill="#0284c7" />
+                        </svg>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-mono text-[10px] font-bold text-sky-800 bg-sky-100 px-2 py-0.5 rounded-md block">
+                          {confirmedAppointment.qrVerificationCode}
+                        </span>
+                        <span className="text-[9px] text-slate-400 block mt-0.5">Scan at OPD kiosk</span>
+                      </div>
                     </div>
                   </div>
 

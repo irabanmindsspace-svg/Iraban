@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { Appointment } from '../types';
 import { 
@@ -14,7 +14,11 @@ import {
   User, 
   Clock, 
   CheckCircle,
-  FileCheck
+  FileCheck,
+  Activity,
+  Heart,
+  Thermometer,
+  Zap
 } from 'lucide-react';
 
 interface Props {
@@ -23,9 +27,14 @@ interface Props {
 }
 
 export const TelemedicineRoom: React.FC<Props> = ({ appointment, onEndCall }) => {
-  const { user } = useApp();
+  const { user, showNotification } = useApp();
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [micEnabled, setMicEnabled] = useState(true);
+  const [callDuration, setCallDuration] = useState(148); // in seconds
+  const [heartRate, setHeartRate] = useState(74);
+  const [spO2, setSpO2] = useState(99);
+  const [bp, setBp] = useState('122/80');
+
   const [chatMessages, setChatMessages] = useState<Array<{ sender: string; text: string; time: string }>>([
     {
       sender: 'Dr. Priya Venkatesh',
@@ -35,64 +44,161 @@ export const TelemedicineRoom: React.FC<Props> = ({ appointment, onEndCall }) =>
   ]);
   const [chatInput, setChatInput] = useState('');
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  const [doctorIsTyping, setDoctorIsTyping] = useState(false);
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Call duration timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCallDuration(prev => prev + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Live heart rate subtle fluctuation simulation
+  useEffect(() => {
+    const hrTimer = setInterval(() => {
+      setHeartRate(prev => Math.floor(72 + Math.random() * 5));
+    }, 3000);
+    return () => clearInterval(hrTimer);
+  }, []);
+
+  // Dynamic Animated ECG Monitor Canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let step = 0;
+    const width = canvas.width;
+    const height = canvas.height;
+
+    const render = () => {
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.2)'; // trail fade
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.strokeStyle = '#10b981'; // emerald green
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      const midY = height / 2;
+      const x = (step * 2) % width;
+
+      // Clear slice ahead of scan head
+      ctx.clearRect(x, 0, 8, height);
+
+      // Draw standard P-Q-R-S-T wave pulse
+      let y = midY;
+      const wavePhase = (step % 60);
+      if (wavePhase === 15) y = midY - 6; // P wave
+      else if (wavePhase === 20) y = midY + 4; // Q wave
+      else if (wavePhase === 22) y = midY - 32; // R spike
+      else if (wavePhase === 25) y = midY + 12; // S dip
+      else if (wavePhase === 32) y = midY - 10; // T wave
+
+      ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#34d399';
+      ctx.fill();
+
+      step++;
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  const formatCallTime = (secs: number) => {
+    const mins = Math.floor(secs / 60);
+    const remainder = secs % 60;
+    return `${mins.toString().padStart(2, '0')}:${remainder.toString().padStart(2, '0')}`;
+  };
 
   const handleSendChat = (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
 
+    const currentText = chatInput.trim();
     setChatMessages(prev => [
       ...prev,
       {
         sender: user?.fullName || 'Patient',
-        text: chatInput.trim(),
+        text: currentText,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
     ]);
     setChatInput('');
+    setDoctorIsTyping(true);
 
-    // Simulate doctor reassuring response after 1.5s
+    // Contextual simulated doctor response based on query
     setTimeout(() => {
+      setDoctorIsTyping(false);
+      let reply = 'Understood. We will keep your current dosage stable and review after 3 weeks.';
+      const lower = currentText.toLowerCase();
+      if (lower.includes('sugar') || lower.includes('fasting') || lower.includes('diabetes')) {
+        reply = 'Good observation. Keep recording the fasting readings daily. Your 6.8% HbA1c shows good control, so continue Metformin 500mg SR after dinner.';
+      } else if (lower.includes('bp') || lower.includes('pressure') || lower.includes('headache')) {
+        reply = 'Your BP monitor reads 122/80 mmHg today which is optimal. Continue Telmisartan 40mg in the morning, and avoid added table salt.';
+      } else if (lower.includes('pain') || lower.includes('cough') || lower.includes('fever')) {
+        reply = 'Please continue warm hydration. I am adding a note in your digital prescription right now.';
+      }
+
       setChatMessages(prev => [
         ...prev,
         {
           sender: 'Dr. Priya Venkatesh',
-          text: 'Understood. We will keep Metformin 500mg SR at dinner, and adjust your lifestyle hydration. I have also issued your updated digital prescription.',
+          text: reply,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         }
       ]);
-    }, 1500);
+    }, 1400);
   };
 
   return (
     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      {/* Session Title Bar */}
+      {/* Session Header Bar */}
       <div className="bg-slate-900 text-white rounded-2xl p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-emerald-400 animate-ping" />
+          <div className="w-3 h-3 rounded-full bg-emerald-400 animate-ping shrink-0" />
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold">Encrypted Telemedicine Session</h2>
+              <h2 className="text-base font-bold">Encrypted Telemedicine OPD Room</h2>
               <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-md border border-emerald-500/30">
-                DISHA / ABDM Secure
+                DISHA / ABDM WebRTC
               </span>
             </div>
             <p className="text-xs text-slate-300">
-              Dr. Priya Venkatesh (MCI-2012-44192) · Patient: {appointment?.patientName || user?.fullName || 'Rajesh Sharma'}
+              Dr. Priya Venkatesh (MCI-2012-44192) · Patient: {user?.fullName || 'Rajesh Sharma'}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-300 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
+            <Clock className="w-3.5 h-3.5 text-sky-400" />
+            <span>{formatCallTime(callDuration)}</span>
+          </div>
+
           <button
             onClick={() => setShowPrescriptionModal(true)}
-            className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[38px]"
+            className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[38px]"
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>Live Digital Prescription</span>
+            <span>Digital Rx</span>
           </button>
+
           <button
-            onClick={onEndCall}
-            className="px-4 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[38px]"
+            onClick={() => {
+              showNotification('Telemedicine consultation ended. Summary saved to health profile.');
+              window.location.hash = '#home';
+            }}
+            className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[38px]"
           >
             <PhoneOff className="w-3.5 h-3.5" />
             <span>End Call</span>
@@ -100,10 +206,10 @@ export const TelemedicineRoom: React.FC<Props> = ({ appointment, onEndCall }) =>
         </div>
       </div>
 
-      {/* Main Grid: Video Stream + Consultation Chat */}
+      {/* Main Grid: Doctor Video & Patient Self View + Chat */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         
-        {/* Left Column: Doctor Video & Patient Self View */}
+        {/* Left Column: Doctor Video & Live Vitals */}
         <div className="lg:col-span-8 flex flex-col gap-4">
           
           {/* Main Doctor Video Feed Simulation */}
@@ -114,9 +220,11 @@ export const TelemedicineRoom: React.FC<Props> = ({ appointment, onEndCall }) =>
                   <User className="w-12 h-12 text-sky-200" />
                 </div>
                 <p className="text-base font-bold">Dr. Priya Venkatesh</p>
-                <p className="text-xs text-slate-400">General Physician & Internal Medicine · AIIMS</p>
-                <span className="mt-2 text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-800">
-                  Audio & Video Connected (1080p WebRTC Encrypted)
+                <p className="text-xs text-slate-400">General Physician & Internal Medicine · AIIMS New Delhi</p>
+                
+                <span className="mt-2 text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-800 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Live 1080p WebRTC Session (Audio & Video Encrypted)
                 </span>
               </div>
             ) : (
@@ -131,16 +239,16 @@ export const TelemedicineRoom: React.FC<Props> = ({ appointment, onEndCall }) =>
               <div className="text-center p-2">
                 <User className="w-5 h-5 mx-auto mb-1 text-slate-400" />
                 <p className="truncate font-semibold">{user?.fullName || 'You'}</p>
-                <p className="text-[9px] text-slate-400">Patient Feed</p>
+                <p className="text-[9px] text-emerald-400">Connected</p>
               </div>
             </div>
 
-            {/* Control Bar */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-700/80">
+            {/* Video Controls overlay */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2.5 bg-slate-900/85 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-700/80">
               <button
                 onClick={() => setMicEnabled(!micEnabled)}
                 className={`p-2.5 rounded-xl transition min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer ${micEnabled ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-rose-600 text-white'}`}
-                title={micEnabled ? 'Mute Microphone' : 'Unmute Microphone'}
+                title={micEnabled ? 'Mute Mic' : 'Unmute Mic'}
               >
                 {micEnabled ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
               </button>
@@ -148,29 +256,64 @@ export const TelemedicineRoom: React.FC<Props> = ({ appointment, onEndCall }) =>
               <button
                 onClick={() => setVideoEnabled(!videoEnabled)}
                 className={`p-2.5 rounded-xl transition min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer ${videoEnabled ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-rose-600 text-white'}`}
-                title={videoEnabled ? 'Stop Camera' : 'Start Camera'}
+                title={videoEnabled ? 'Stop Video' : 'Start Video'}
               >
                 {videoEnabled ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
-              </button>
-
-              <button
-                onClick={onEndCall}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[44px]"
-              >
-                <PhoneOff className="w-4 h-4" />
-                <span>Leave</span>
               </button>
             </div>
           </div>
 
-          {/* Vitals Summary Card */}
-          <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4 text-xs">
-            <div>
-              <span className="text-slate-400 text-[11px] block">Patient Reported Vitals</span>
-              <span className="font-bold text-slate-900">BP: 122/80 mmHg · Pulse: 72 bpm · SpO2: 99% · Temp: 98.4°F</span>
+          {/* Dynamic Animated ECG & Live Telemetry Bar */}
+          <div className="bg-slate-950 text-white rounded-2xl p-4 border border-slate-800 shadow-md">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2.5 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+                <span className="font-bold text-xs uppercase tracking-wider text-slate-300">
+                  Live Patient Clinical Telemetry Feed
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-emerald-400">
+                Lead II Real-Time Waveform
+              </span>
             </div>
-            <div className="text-slate-500 text-[11px]">
-              Active Token: <strong className="font-mono text-slate-800">SNJ-TELE-2026-9912</strong>
+
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+              {/* ECG Canvas Waveform */}
+              <div className="md:col-span-6 bg-slate-900/80 rounded-xl p-2 border border-slate-800 flex items-center justify-center">
+                <canvas 
+                  ref={canvasRef} 
+                  width={340} 
+                  height={60} 
+                  className="w-full h-15 rounded-lg"
+                />
+              </div>
+
+              {/* Numerical vitals metrics */}
+              <div className="md:col-span-6 grid grid-cols-3 gap-2 text-center">
+                <div className="p-2 bg-slate-900 rounded-xl border border-slate-800">
+                  <div className="flex items-center justify-center gap-1 text-rose-400 text-[10px] font-bold">
+                    <Heart className="w-3 h-3 fill-rose-500 animate-pulse" />
+                    <span>PULSE</span>
+                  </div>
+                  <span className="text-lg font-extrabold text-white tabular-nums block mt-0.5">
+                    {heartRate} <span className="text-[10px] font-normal text-slate-400">bpm</span>
+                  </span>
+                </div>
+
+                <div className="p-2 bg-slate-900 rounded-xl border border-slate-800">
+                  <span className="text-sky-400 text-[10px] font-bold block">SpO2</span>
+                  <span className="text-lg font-extrabold text-white tabular-nums block mt-0.5">
+                    {spO2}%
+                  </span>
+                </div>
+
+                <div className="p-2 bg-slate-900 rounded-xl border border-slate-800">
+                  <span className="text-emerald-400 text-[10px] font-bold block">BP</span>
+                  <span className="text-base font-extrabold text-white tabular-nums block mt-0.5">
+                    {bp}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -201,6 +344,13 @@ export const TelemedicineRoom: React.FC<Props> = ({ appointment, onEndCall }) =>
                 <p className="leading-relaxed">{msg.text}</p>
               </div>
             ))}
+
+            {doctorIsTyping && (
+              <div className="p-2 text-[11px] text-slate-400 italic flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping" />
+                <span>Dr. Priya Venkatesh is typing reply...</span>
+              </div>
+            )}
           </div>
 
           {/* Chat input */}
@@ -209,7 +359,7 @@ export const TelemedicineRoom: React.FC<Props> = ({ appointment, onEndCall }) =>
               type="text"
               value={chatInput}
               onChange={e => setChatInput(e.target.value)}
-              placeholder="Type message to doctor..."
+              placeholder="Ask doctor about medicines, reports..."
               className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-sky-500 text-slate-900 min-h-[40px]"
             />
             <button
@@ -224,7 +374,7 @@ export const TelemedicineRoom: React.FC<Props> = ({ appointment, onEndCall }) =>
 
       </div>
 
-      {/* Modal: Live Digital Prescription Modal */}
+      {/* Modal: Live Digital Prescription */}
       {showPrescriptionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">

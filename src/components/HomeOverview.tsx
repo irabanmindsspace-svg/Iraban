@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { InteractiveMap } from './InteractiveMap';
+import { SymptomTriageBodyMap } from './SymptomTriageBodyMap';
+import { SavingsCalculator } from './SavingsCalculator';
 import { 
   ShieldAlert, 
   Stethoscope, 
@@ -18,7 +21,13 @@ import {
   Clock, 
   MapPin, 
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Search,
+  Sparkles,
+  Bed,
+  Activity,
+  Ambulance,
+  Mic
 } from 'lucide-react';
 
 export const HomeOverview: React.FC = () => {
@@ -29,6 +38,9 @@ export const HomeOverview: React.FC = () => {
     setIsEmergencyModalOpen, 
     showNotification 
   } = useApp();
+
+  const [quickSearch, setQuickSearch] = useState('');
+  const [activeInteractiveTab, setActiveInteractiveTab] = useState<'map' | 'triage' | 'calculator'>('map');
 
   const PRIMARY_ACTIONS = [
     {
@@ -122,6 +134,23 @@ export const HomeOverview: React.FC = () => {
     }
   ];
 
+  const handleQuickSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickSearch.trim()) return;
+    const lower = quickSearch.toLowerCase();
+    if (lower.includes('hosp') || lower.includes('bed') || lower.includes('icu') || lower.includes('aiims')) {
+      setActiveTab('hospitals');
+    } else if (lower.includes('medicine') || lower.includes('pharm') || lower.includes('dolo') || lower.includes('metformin')) {
+      setActiveTab('pharmacy');
+    } else if (lower.includes('lab') || lower.includes('test') || lower.includes('blood test') || lower.includes('cbc')) {
+      setActiveTab('labs');
+    } else if (lower.includes('blood') || lower.includes('o+') || lower.includes('donor')) {
+      setActiveTab('blood');
+    } else {
+      setActiveTab('doctors');
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
       
@@ -131,7 +160,7 @@ export const HomeOverview: React.FC = () => {
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-xs uppercase tracking-wider font-semibold text-slate-300">
-              National Medical Assistance Network · India
+              National Digital Health & Medical Assistance Network · India
             </span>
           </div>
 
@@ -142,13 +171,34 @@ export const HomeOverview: React.FC = () => {
             Accessible, multilingual healthcare coordination for every citizen across metropolitan cities, small towns, and rural districts.
           </p>
 
+          {/* Quick Voice / Text Search input */}
+          <form onSubmit={handleQuickSearchSubmit} className="mt-5 flex items-center gap-2 max-w-lg">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <input
+                type="text"
+                value={quickSearch}
+                onChange={e => setQuickSearch(e.target.value)}
+                placeholder="Search doctors, hospitals, medicines, PIN code..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/10 text-white placeholder:text-slate-400 border border-slate-700 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-sky-400 min-h-[44px]"
+              />
+            </div>
+            <button
+              type="submit"
+              className="px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs sm:text-sm rounded-xl transition cursor-pointer min-h-[44px]"
+            >
+              Search
+            </button>
+          </form>
+
+          {/* Emergency SOS & HealthGuide CTAs */}
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <button
               onClick={() => setIsEmergencyModalOpen(true)}
               className="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg flex items-center gap-2 transition active:scale-95 cursor-pointer min-h-[48px]"
             >
               <ShieldAlert className="w-4 h-4 animate-bounce" />
-              <span>🚨 1-Tap Emergency Help</span>
+              <span>🚨 1-Tap Emergency Help (108 / 112)</span>
             </button>
 
             <button
@@ -167,8 +217,80 @@ export const HomeOverview: React.FC = () => {
             <MapPin className="w-3.5 h-3.5 text-sky-400" />
             <span>Serving {user?.location.city || 'New Delhi'}, {user?.location.state || 'Delhi'} ({user?.location.pincode || '110001'})</span>
           </div>
-          <span>Ayushman Bharat (PM-JAY) & NMC Empanelled</span>
+          <span>Ayushman Bharat (PM-JAY) & NMC Empanelled · 24x7 Active</span>
         </div>
+      </div>
+
+      {/* Dynamic Real-Time Ticker: Casualty Beds & Emergency Fleet Monitor */}
+      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+          <span className="font-bold text-slate-900">Live Hospital Network Status in {user?.location.city || 'New Delhi'}:</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4 text-slate-600">
+          <span className="flex items-center gap-1 font-semibold">
+            <Bed className="w-3.5 h-3.5 text-sky-600" />
+            <strong className="text-slate-900 tabular-nums">379</strong> General Beds Ready
+          </span>
+          <span className="flex items-center gap-1 font-semibold">
+            <Activity className="w-3.5 h-3.5 text-rose-600" />
+            <strong className="text-slate-900 tabular-nums">42</strong> ICU Beds Ready
+          </span>
+          <span className="flex items-center gap-1 font-semibold">
+            <Ambulance className="w-3.5 h-3.5 text-emerald-600" />
+            <strong className="text-slate-900 tabular-nums">35</strong> Ambulances Patrol
+          </span>
+        </div>
+
+        <button
+          onClick={() => setActiveTab('hospitals')}
+          className="text-sky-700 hover:text-sky-900 font-bold flex items-center gap-1 cursor-pointer"
+        >
+          <span>View All Facilities</span>
+          <ArrowRight className="w-3 h-3" />
+        </button>
+      </div>
+
+      {/* Interactive Tool Switcher (Geo-Locator Map / Symptom Triage / Medicine Calculator) */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-bold text-slate-900">
+            Interactive Healthcare Tools
+          </h2>
+
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+            <button
+              onClick={() => setActiveInteractiveTab('map')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                activeInteractiveTab === 'map' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Live Radar Map
+            </button>
+            <button
+              onClick={() => setActiveInteractiveTab('triage')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                activeInteractiveTab === 'triage' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Visual Symptom Triage
+            </button>
+            <button
+              onClick={() => setActiveInteractiveTab('calculator')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                activeInteractiveTab === 'calculator' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Medicine Savings Calculator
+            </button>
+          </div>
+        </div>
+
+        {/* Render Selected Interactive Tool */}
+        {activeInteractiveTab === 'map' && <InteractiveMap />}
+        {activeInteractiveTab === 'triage' && <SymptomTriageBodyMap />}
+        {activeInteractiveTab === 'calculator' && <SavingsCalculator />}
       </div>
 
       {/* Primary Action Matrix (Grid) */}
