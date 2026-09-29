@@ -1,0 +1,6 @@
+{
+  "name": "Sanjeevani - India Digital Medical Assistance Platform",
+  "description": "Production-ready, accessible, multilingual digital healthcare and emergency assistance platform connecting citizens, doctors, hospitals, pharmacies, and diagnostic laboratories across India.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
