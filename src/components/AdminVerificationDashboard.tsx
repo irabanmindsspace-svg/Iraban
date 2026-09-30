@@ -54,47 +54,47 @@ export const AdminVerificationDashboard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-5">
       
       {/* Header */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+      <div className="bg-white rounded-lg p-5 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-lg font-bold tracking-tight text-slate-900">
                 Medical Platform Administration & Verification
               </h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-900 text-white rounded-md">
+              <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-900 text-white rounded">
                 Admin Console
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 mt-0.5">
               National Medical Commission (NMC) credential verification, audit logs, and provider oversight.
             </p>
           </div>
 
-          <div className="text-xs text-slate-500 flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Anti-Fraud & Zero Fake Practitioner Policy</span>
+          <div className="text-xs text-slate-600 flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
+            <ShieldCheck className="w-4 h-4 text-emerald-700" />
+            <span>Anti-Fraud & Practitioner Registry Protection</span>
           </div>
         </div>
 
         {/* Analytics Top Cards */}
         {overview?.metrics && (
-          <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 bg-sky-50/60 rounded-xl border border-sky-100">
-              <span className="text-[11px] font-medium text-slate-500 block">Total Practitioners</span>
-              <span className="text-xl font-extrabold text-slate-900 tabular-nums">
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="p-3 bg-slate-50 rounded border border-slate-200">
+              <span className="text-[11px] font-medium text-slate-500 block uppercase">Practitioners</span>
+              <span className="text-lg font-bold text-slate-900 tabular-nums">
                 {overview.metrics.totalDoctors}
               </span>
-              <span className="text-[10px] text-emerald-700 block mt-0.5 font-semibold">
+              <span className="text-[10px] text-emerald-800 block mt-0.5 font-semibold">
                 {overview.metrics.verifiedDoctors} NMC Verified
               </span>
             </div>
 
-            <div className="p-3.5 bg-emerald-50/60 rounded-xl border border-emerald-100">
-              <span className="text-[11px] font-medium text-slate-500 block">Empanelled Hospitals</span>
-              <span className="text-xl font-extrabold text-slate-900 tabular-nums">
+            <div className="p-3 bg-slate-50 rounded border border-slate-200">
+              <span className="text-[11px] font-medium text-slate-500 block uppercase">Empanelled Hospitals</span>
+              <span className="text-lg font-bold text-slate-900 tabular-nums">
                 {overview.metrics.totalHospitals}
               </span>
               <span className="text-[10px] text-slate-500 block mt-0.5">
@@ -102,19 +102,19 @@ export const AdminVerificationDashboard: React.FC = () => {
               </span>
             </div>
 
-            <div className="p-3.5 bg-purple-50/60 rounded-xl border border-purple-100">
-              <span className="text-[11px] font-medium text-slate-500 block">Appointments Booked</span>
-              <span className="text-xl font-extrabold text-slate-900 tabular-nums">
+            <div className="p-3 bg-slate-50 rounded border border-slate-200">
+              <span className="text-[11px] font-medium text-slate-500 block uppercase">Appointments</span>
+              <span className="text-lg font-bold text-slate-900 tabular-nums">
                 {overview.metrics.totalAppointments}
               </span>
-              <span className="text-[10px] text-purple-700 block mt-0.5 font-semibold">
+              <span className="text-[10px] text-slate-600 block mt-0.5 font-semibold">
                 {overview.metrics.completedAppointments} Completed
               </span>
             </div>
 
-            <div className="p-3.5 bg-rose-50/60 rounded-xl border border-rose-100">
-              <span className="text-[11px] font-medium text-slate-500 block">Emergency Alerts</span>
-              <span className="text-xl font-extrabold text-rose-700 tabular-nums">
+            <div className="p-3 bg-slate-50 rounded border border-slate-200">
+              <span className="text-[11px] font-medium text-slate-500 block uppercase">Emergency Alerts</span>
+              <span className="text-lg font-bold text-red-700 tabular-nums">
                 {overview.metrics.emergencyAlertsHandled}
               </span>
               <span className="text-[10px] text-slate-500 block mt-0.5">
@@ -126,61 +126,61 @@ export const AdminVerificationDashboard: React.FC = () => {
       </div>
 
       {/* Practitioner Verification Queue */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
-        <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-sky-600" />
+      <div className="bg-white rounded-lg p-5 border border-slate-200 space-y-3.5">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+          <ShieldCheck className="w-4 h-4 text-sky-800" />
           <span>Healthcare Practitioner Credential Verification</span>
         </h2>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
+              <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px] bg-slate-50/70">
                 <th className="py-2.5 px-3">Doctor</th>
-                <th className="py-2.5 px-3">Council Reg Number</th>
-                <th className="py-2.5 px-3">Affiliated Hospital</th>
-                <th className="py-2.5 px-3">State Medical Council</th>
+                <th className="py-2.5 px-3">Registration Number</th>
+                <th className="py-2.5 px-3">Hospital</th>
+                <th className="py-2.5 px-3">Council</th>
                 <th className="py-2.5 px-3">Status</th>
-                <th className="py-2.5 px-3 text-right">Verification Action</th>
+                <th className="py-2.5 px-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {doctors.map(doc => (
-                <tr key={doc.id} className="hover:bg-slate-50 transition">
-                  <td className="py-3 px-3">
+                <tr key={doc.id} className="hover:bg-slate-50/80 transition">
+                  <td className="py-2.5 px-3">
                     <p className="font-bold text-slate-900">{doc.fullName}</p>
                     <p className="text-[11px] text-slate-500">{doc.specialization}</p>
                   </td>
-                  <td className="py-3 px-3 font-mono font-semibold text-slate-800">
+                  <td className="py-2.5 px-3 font-mono font-medium text-slate-800">
                     {doc.registrationNumber}
                   </td>
-                  <td className="py-3 px-3 text-slate-600">
+                  <td className="py-2.5 px-3 text-slate-600">
                     {doc.hospitalAffiliation}
                   </td>
-                  <td className="py-3 px-3 text-slate-500">
+                  <td className="py-2.5 px-3 text-slate-500">
                     {doc.medicalCouncil}
                   </td>
-                  <td className="py-3 px-3">
+                  <td className="py-2.5 px-3">
                     {doc.isVerified ? (
-                      <span className="font-bold text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      <span className="font-medium text-[10px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                         VERIFIED
                       </span>
                     ) : (
-                      <span className="font-bold text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      <span className="font-medium text-[10px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                         PENDING
                       </span>
                     )}
                   </td>
-                  <td className="py-3 px-3 text-right">
+                  <td className="py-2.5 px-3 text-right">
                     <button
                       onClick={() => handleToggleDoctorVerify(doc.id, doc.isVerified)}
-                      className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${
+                      className={`px-2.5 py-1 rounded font-medium text-xs transition cursor-pointer btn-press ${
                         doc.isVerified 
-                          ? 'bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-700' 
-                          : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                          ? 'bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-700 border border-slate-200' 
+                          : 'bg-emerald-700 hover:bg-emerald-800 text-white'
                       }`}
                     >
-                      {doc.isVerified ? 'Revoke Badge' : 'Verify & Approve'}
+                      {doc.isVerified ? 'Revoke' : 'Approve'}
                     </button>
                   </td>
                 </tr>
@@ -192,10 +192,10 @@ export const AdminVerificationDashboard: React.FC = () => {
 
       {/* DISHA / ABDM Audit Logs */}
       {overview?.auditLogs && (
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-3">
-          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <History className="w-5 h-5 text-slate-600" />
-            <span>Healthcare Data Governance Audit Trail (DISHA & ABDM Compliant)</span>
+        <div className="bg-white rounded-lg p-5 border border-slate-200 space-y-3">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+            <History className="w-4 h-4 text-slate-700" />
+            <span>Healthcare Governance Audit Trail (DISHA & ABDM Compliant)</span>
           </h2>
           <p className="text-xs text-slate-500">
             Immutable log of role access, credential checks, emergency triggers, and health record consents.
@@ -203,16 +203,16 @@ export const AdminVerificationDashboard: React.FC = () => {
 
           <div className="space-y-2">
             {overview.auditLogs.map((log: any) => (
-              <div key={log.id} className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
+              <div key={log.id} className="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center justify-between text-xs">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-800">{log.action}</span>
-                    <span className="text-[10px] font-semibold text-slate-400">by {log.actor}</span>
+                    <span className="font-semibold text-slate-900">{log.action}</span>
+                    <span className="text-[10px] text-slate-500">by {log.actor}</span>
                   </div>
-                  <p className="text-slate-600 mt-0.5">{log.details}</p>
+                  <p className="text-slate-600 mt-0.5 text-[11px]">{log.details}</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">
+                  <span className="text-[10px] font-medium px-2 py-0.5 bg-slate-200 text-slate-800 rounded">
                     {log.status}
                   </span>
                   <p className="text-[10px] text-slate-400 mt-1 font-mono">{log.timestamp.slice(0, 19).replace('T', ' ')}</p>

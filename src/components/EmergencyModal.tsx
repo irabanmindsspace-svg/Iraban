@@ -86,98 +86,98 @@ export const EmergencyModal: React.FC = () => {
   const currentGuide = guides.find(g => g.id === activeGuideId) || guides[0];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-3 sm:p-5 overflow-y-auto">
-      <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-rose-300 overflow-hidden my-auto max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-3 sm:p-5 overflow-y-auto">
+      <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-2xl border border-slate-300 overflow-hidden my-auto max-h-[92vh] flex flex-col">
         
         {/* Urgent Header Banner */}
-        <div className="bg-rose-600 text-white px-5 py-4 flex items-center justify-between">
+        <div className="bg-red-700 text-white px-5 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="p-2 bg-white/20 rounded-xl">
-              <AlertTriangle className="w-6 h-6 text-white animate-pulse" />
+            <span className="p-1.5 bg-red-800 rounded">
+              <AlertTriangle className="w-5 h-5 text-white" />
             </span>
             <div>
-              <h2 className="text-lg font-extrabold tracking-tight">EMERGENCY ASSISTANCE / आपातकालीन सहायता</h2>
-              <p className="text-xs text-rose-100 font-normal">Direct Emergency Dispatch & Verified Casualty Centers</p>
+              <h2 className="text-base font-bold tracking-tight">Emergency Assistance & Triage</h2>
+              <p className="text-xs text-red-100">National Ambulance Dispatch & 24x7 Casualty Centers</p>
             </div>
           </div>
           <button
             onClick={() => setIsEmergencyModalOpen(false)}
-            className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-1.5 text-white/80 hover:text-white rounded hover:bg-white/10 transition-colors cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center btn-press"
             aria-label="Close emergency modal"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Quick Dial Emergency Numbers Grid */}
-        <div className="bg-rose-50 border-b border-rose-200 p-4 sm:p-5">
-          <p className="text-xs font-bold text-rose-900 mb-2.5 uppercase tracking-wide">
-            Tap to Call Verified National Hotlines (Free 24x7)
+        <div className="bg-red-50/60 border-b border-red-200 p-4 sm:p-5">
+          <p className="text-[11px] font-bold text-red-900 mb-2 uppercase tracking-wider">
+            Verified National Helplines (Toll-Free 24x7)
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             <a
               href="tel:108"
-              className="flex flex-col items-center justify-center p-3 bg-white hover:bg-rose-100 rounded-xl border border-rose-300 text-center shadow-xs transition active:scale-95 min-h-[58px]"
+              className="flex flex-col items-center justify-center p-2.5 bg-white hover:bg-red-50 rounded border border-red-200 text-center transition btn-press min-h-[56px]"
             >
-              <div className="flex items-center gap-1.5 text-rose-700 font-extrabold text-base">
-                <Phone className="w-4 h-4 fill-rose-600" />
+              <div className="flex items-center gap-1.5 text-red-700 font-bold text-base">
+                <Phone className="w-4 h-4 fill-red-700" />
                 <span>108</span>
               </div>
-              <span className="text-[11px] font-semibold text-slate-700">Ambulance</span>
+              <span className="text-[11px] font-medium text-slate-700">Ambulance</span>
             </a>
 
             <a
               href="tel:112"
-              className="flex flex-col items-center justify-center p-3 bg-white hover:bg-rose-100 rounded-xl border border-rose-300 text-center shadow-xs transition active:scale-95 min-h-[58px]"
+              className="flex flex-col items-center justify-center p-2.5 bg-white hover:bg-red-50 rounded border border-red-200 text-center transition btn-press min-h-[56px]"
             >
-              <div className="flex items-center gap-1.5 text-rose-700 font-extrabold text-base">
-                <Phone className="w-4 h-4 fill-rose-600" />
+              <div className="flex items-center gap-1.5 text-red-700 font-bold text-base">
+                <Phone className="w-4 h-4 fill-red-700" />
                 <span>112</span>
               </div>
-              <span className="text-[11px] font-semibold text-slate-700">National Emergency</span>
+              <span className="text-[11px] font-medium text-slate-700">National Emergency</span>
             </a>
 
             <a
               href="tel:102"
-              className="flex flex-col items-center justify-center p-3 bg-white hover:bg-rose-100 rounded-xl border border-rose-300 text-center shadow-xs transition active:scale-95 min-h-[58px]"
+              className="flex flex-col items-center justify-center p-2.5 bg-white hover:bg-red-50 rounded border border-slate-200 text-center transition btn-press min-h-[56px]"
             >
-              <div className="flex items-center gap-1.5 text-slate-800 font-extrabold text-base">
+              <div className="flex items-center gap-1.5 text-slate-900 font-bold text-base">
                 <Phone className="w-4 h-4 text-slate-600" />
                 <span>102</span>
               </div>
-              <span className="text-[11px] font-semibold text-slate-700">Maternity / Infant</span>
+              <span className="text-[11px] font-medium text-slate-700">Maternity / Infant</span>
             </a>
 
             <a
               href="tel:14416"
-              className="flex flex-col items-center justify-center p-3 bg-white hover:bg-rose-100 rounded-xl border border-rose-300 text-center shadow-xs transition active:scale-95 min-h-[58px]"
+              className="flex flex-col items-center justify-center p-2.5 bg-white hover:bg-red-50 rounded border border-slate-200 text-center transition btn-press min-h-[56px]"
             >
-              <div className="flex items-center gap-1.5 text-slate-800 font-extrabold text-base">
+              <div className="flex items-center gap-1.5 text-slate-900 font-bold text-base">
                 <Phone className="w-4 h-4 text-slate-600" />
                 <span>14416</span>
               </div>
-              <span className="text-[11px] font-semibold text-slate-700">Tele-MANAS Mental</span>
+              <span className="text-[11px] font-medium text-slate-700">Tele-MANAS Mental</span>
             </a>
           </div>
         </div>
 
         {/* Scrollable Content */}
-        <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1">
+        <div className="p-4 sm:p-5 overflow-y-auto space-y-5 flex-1">
 
           {/* SOS Dispatch Action Card */}
-          <div className="p-4 rounded-xl bg-slate-900 text-white">
+          <div className="p-4 rounded-lg bg-slate-900 text-white border border-slate-800">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <Radio className="w-5 h-5 text-rose-400 animate-pulse" />
-                  <h3 className="font-bold text-sm text-white">1-Tap Location & SOS Broadcast</h3>
+                  <Radio className="w-4 h-4 text-red-400" />
+                  <h3 className="font-bold text-sm text-white">Direct Location & SOS Broadcast</h3>
                 </div>
-                <p className="text-xs text-slate-300 mt-1">
-                  Transmits GPS coordinates to nearest 108 ambulance dispatch and sends SMS alerts to your emergency contacts:
-                  {user?.dependents.map(d => d.fullName).join(', ')}.
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  Transmits GPS coordinates to nearest 108 ambulance dispatch and notifies emergency contacts:
+                  {' '}{user?.dependents.map(d => d.fullName).join(', ')}.
                 </p>
-                <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-2">
-                  <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-red-400" />
                   <span>{user?.location.address || 'Connaught Place, New Delhi'}</span>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export const EmergencyModal: React.FC = () => {
               <button
                 onClick={handleBroadcastSOS}
                 disabled={broadcasting || !!dispatchInfo}
-                className="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 whitespace-nowrap min-h-[48px] cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-rose-900/50"
+                className="px-4 py-2.5 rounded bg-red-700 hover:bg-red-800 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition whitespace-nowrap min-h-[44px] cursor-pointer flex items-center justify-center gap-2 btn-press"
               >
                 {broadcasting ? (
                   <span>Broadcasting SOS...</span>
@@ -202,35 +202,35 @@ export const EmergencyModal: React.FC = () => {
 
             {/* If Dispatched Status with Live Stepper */}
             {dispatchInfo && (
-              <div className="mt-4 pt-3 border-t border-slate-700/60 text-xs bg-slate-800/80 p-3.5 rounded-xl space-y-3">
+              <div className="mt-4 pt-3 border-t border-slate-800 text-xs bg-slate-800/80 p-3.5 rounded space-y-3">
                 {/* Stepper */}
                 <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-bold">
-                  <div className="p-2 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800">
-                    <span className="block text-emerald-400">✓ Step 1</span>
+                  <div className="p-2 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+                    <span className="block text-emerald-400">Step 1</span>
                     SOS Acknowledged
                   </div>
-                  <div className="p-2 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800">
-                    <span className="block text-emerald-400">✓ Step 2</span>
+                  <div className="p-2 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+                    <span className="block text-emerald-400">Step 2</span>
                     Ambulance Assigned
                   </div>
-                  <div className="p-2 rounded-lg bg-sky-950 text-sky-300 border border-sky-800 animate-pulse">
-                    <span className="block text-sky-400">● Step 3</span>
-                    En-Route (Live GPS)
+                  <div className="p-2 rounded bg-sky-950 text-sky-300 border border-sky-800">
+                    <span className="block text-sky-400">Step 3</span>
+                    En-Route (Live Dispatch)
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between font-semibold text-emerald-400">
-                  <span className="text-xs">Ambulance ETA: ~6 mins (Patrol moving towards you)</span>
-                  <span>Vehicle: {dispatchInfo.dispatchedAmbulance.vehicleNumber}</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between font-semibold text-emerald-400 gap-1">
+                  <span className="text-xs">Ambulance ETA: ~6 mins (Dispatched towards you)</span>
+                  <span className="text-[11px] text-slate-300 font-mono">Vehicle: {dispatchInfo.dispatchedAmbulance.vehicleNumber}</span>
                 </div>
-                <p className="text-slate-300">
+                <p className="text-slate-300 text-[11px]">
                   Driver: {dispatchInfo.dispatchedAmbulance.driverName} ({dispatchInfo.dispatchedAmbulance.driverPhone}) · {dispatchInfo.dispatchedAmbulance.type}
                 </p>
 
                 {/* Web Share Button */}
-                <div className="pt-2 border-t border-slate-700 flex items-center justify-between">
+                <div className="pt-2 border-t border-slate-700 flex flex-wrap items-center justify-between gap-2">
                   <span className="text-[11px] text-slate-400">
-                    ✓ SMS location broadcast sent to {dispatchInfo.notifiedContacts.length} emergency contacts.
+                    SMS location broadcast sent to {dispatchInfo.notifiedContacts.length} emergency contacts.
                   </span>
                   
                   <button
@@ -239,7 +239,7 @@ export const EmergencyModal: React.FC = () => {
                       const nav = typeof navigator !== 'undefined' ? (navigator as any) : null;
                       if (nav && nav.share) {
                         nav.share({
-                          title: '🚨 MEDICAL EMERGENCY SOS',
+                          title: 'MEDICAL EMERGENCY SOS',
                           text: alertText,
                           url: window.location.href,
                         }).catch(() => {});
@@ -248,9 +248,9 @@ export const EmergencyModal: React.FC = () => {
                         alert('Emergency broadcast message copied to clipboard. Paste into WhatsApp or SMS.');
                       }
                     }}
-                    className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-[11px] rounded-lg transition cursor-pointer"
+                    className="px-3 py-1.5 bg-red-700 hover:bg-red-800 text-white font-medium text-[11px] rounded transition cursor-pointer btn-press"
                   >
-                    Share Live SOS with Family
+                    Share SOS with Family
                   </button>
                 </div>
               </div>
@@ -259,31 +259,31 @@ export const EmergencyModal: React.FC = () => {
 
           {/* First Aid Instructions & Protocol Tabs */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <LifeBuoy className="w-4 h-4 text-sky-600" />
-                <span>Instant First-Aid & Emergency Action Protocols</span>
+            <div className="flex items-center justify-between mb-2.5">
+              <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5 uppercase tracking-wide">
+                <LifeBuoy className="w-4 h-4 text-sky-800" />
+                <span>Immediate First-Aid Protocols</span>
               </h3>
 
               {currentGuide && (
                 <button
-                  onClick={() => handleReadAloud(`${currentGuide.title}. Urgent warning signs: ${currentGuide.urgentSigns.join('. ')}. Action steps: ${currentGuide.firstAidSteps.join('. ')}`)}
-                  className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-colors cursor-pointer"
+                  onClick={() => handleReadAloud(`${currentGuide.title}. Warning signs: ${currentGuide.urgentSigns.join('. ')}. Action steps: ${currentGuide.firstAidSteps.join('. ')}`)}
+                  className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition cursor-pointer btn-press border border-slate-200"
                   title="Read aloud first aid instructions"
                 >
                   {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                  <span>{isSpeaking ? 'Stop Audio' : 'Listen Instructions'}</span>
+                  <span>{isSpeaking ? 'Stop Audio' : 'Listen'}</span>
                 </button>
               )}
             </div>
 
-            {/* Guide selection chips */}
-            <div className="flex flex-wrap gap-1.5 p-1 bg-slate-100 rounded-xl mb-3">
+            {/* Guide selection tabs */}
+            <div className="flex flex-wrap gap-1 p-1 bg-slate-100 rounded mb-2.5">
               {guides.map(g => (
                 <button
                   key={g.id}
                   onClick={() => setActiveGuideId(g.id)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${activeGuideId === g.id ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                  className={`px-2.5 py-1 text-xs font-medium rounded transition cursor-pointer btn-press ${activeGuideId === g.id ? 'bg-white text-slate-900 shadow-xs border border-slate-200' : 'text-slate-600 hover:text-slate-900'}`}
                 >
                   {g.title.split('/')[0].trim()}
                 </button>
@@ -292,10 +292,10 @@ export const EmergencyModal: React.FC = () => {
 
             {/* Guide Details Card */}
             {currentGuide && (
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3 text-xs">
+              <div className="p-4 rounded border border-slate-200 bg-slate-50/70 space-y-2.5 text-xs">
                 <div>
                   <h4 className="font-bold text-slate-900 text-sm mb-1">{currentGuide.title}</h4>
-                  <p className="text-rose-700 font-semibold mb-1">Warning Signs:</p>
+                  <p className="text-red-700 font-semibold mb-1">Warning Signs:</p>
                   <ul className="list-disc pl-4 space-y-0.5 text-slate-700">
                     {currentGuide.urgentSigns.map((sign, idx) => (
                       <li key={idx}>{sign}</li>
@@ -304,7 +304,7 @@ export const EmergencyModal: React.FC = () => {
                 </div>
 
                 <div className="pt-2 border-t border-slate-200">
-                  <p className="text-emerald-800 font-bold mb-1">Immediate First-Aid Steps:</p>
+                  <p className="text-emerald-800 font-bold mb-1">Action Steps:</p>
                   <ol className="list-decimal pl-4 space-y-1 text-slate-800">
                     {currentGuide.firstAidSteps.map((step, idx) => (
                       <li key={idx} className="font-medium">{step}</li>
@@ -313,7 +313,7 @@ export const EmergencyModal: React.FC = () => {
                 </div>
 
                 {currentGuide.whatNotToDo.length > 0 && (
-                  <div className="pt-2 border-t border-slate-200 text-rose-800">
+                  <div className="pt-2 border-t border-slate-200 text-red-800">
                     <p className="font-bold mb-1">What NOT To Do:</p>
                     <ul className="list-disc pl-4 space-y-0.5">
                       {currentGuide.whatNotToDo.map((item, idx) => (
@@ -328,19 +328,19 @@ export const EmergencyModal: React.FC = () => {
 
           {/* Nearest Emergency-Capable Hospitals with Real Availability */}
           <div>
-            <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-emerald-600" />
-              <span>Nearby Emergency Casualty Centers (Verified Real-Time Status)</span>
+            <h3 className="text-xs font-bold text-slate-900 mb-2.5 flex items-center gap-1.5 uppercase tracking-wide">
+              <Activity className="w-4 h-4 text-emerald-700" />
+              <span>Nearby Emergency Casualty Centers (Live Status)</span>
             </h3>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {hospitals.slice(0, 3).map(h => (
-                <div key={h.id} className="p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white transition">
+                <div key={h.id} className="p-3 rounded border border-slate-200 hover:border-slate-300 bg-white transition">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-slate-900 text-xs sm:text-sm">{h.name}</span>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">
+                        <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-emerald-50 text-emerald-800 rounded border border-emerald-200">
                           24x7 Casualty Open
                         </span>
                       </div>
@@ -349,7 +349,7 @@ export const EmergencyModal: React.FC = () => {
 
                     <a
                       href={`tel:${h.emergencyPhone}`}
-                      className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs whitespace-nowrap min-h-[38px]"
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-xs whitespace-nowrap min-h-[36px] btn-press"
                     >
                       <Phone className="w-3.5 h-3.5" />
                       <span>Call {h.emergencyPhone}</span>
@@ -357,18 +357,18 @@ export const EmergencyModal: React.FC = () => {
                   </div>
 
                   {/* Bed and ICU Status */}
-                  <div className="mt-2.5 pt-2 border-t border-slate-100 flex flex-wrap items-center gap-4 text-[11px] text-slate-600">
+                  <div className="mt-2 pt-2 border-t border-slate-100 flex flex-wrap items-center gap-4 text-[11px] text-slate-600">
                     <span className="flex items-center gap-1">
-                      <Bed className="w-3.5 h-3.5 text-sky-600" />
-                      <strong>{h.beds.availableGeneral}</strong> General Beds Free
+                      <Bed className="w-3.5 h-3.5 text-sky-700" />
+                      <strong className="text-slate-900">{h.beds.availableGeneral}</strong> General Beds
                     </span>
                     <span className="flex items-center gap-1">
-                      <Activity className="w-3.5 h-3.5 text-rose-600" />
-                      <strong>{h.beds.availableIcu}</strong> ICU Beds Ready
+                      <Activity className="w-3.5 h-3.5 text-red-700" />
+                      <strong className="text-slate-900">{h.beds.availableIcu}</strong> ICU Ready
                     </span>
                     <span className="flex items-center gap-1">
-                      <Ambulance className="w-3.5 h-3.5 text-emerald-600" />
-                      <strong>{h.ambulanceStandbyCount}</strong> Ambulances on Standby
+                      <Ambulance className="w-3.5 h-3.5 text-emerald-700" />
+                      <strong className="text-slate-900">{h.ambulanceStandbyCount}</strong> Ambulances on Standby
                     </span>
                   </div>
                 </div>
@@ -379,13 +379,13 @@ export const EmergencyModal: React.FC = () => {
         </div>
 
         {/* Footer Disclaimer */}
-        <div className="bg-slate-100 px-5 py-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+        <div className="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
           <p>
-            *Sanjeevani emergency assistance directs users to certified government and accredited trauma infrastructure. Never ignore emergency symptoms.
+            Emergency assistance directs to accredited government & trauma infrastructure.
           </p>
           <button
             onClick={() => setIsEmergencyModalOpen(false)}
-            className="px-4 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-200 rounded-lg border border-slate-300 cursor-pointer min-h-[36px]"
+            className="px-3.5 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 rounded border border-slate-300 cursor-pointer min-h-[34px] btn-press"
           >
             Close
           </button>

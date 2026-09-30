@@ -3,18 +3,18 @@ import { useApp } from '../context/AppContext';
 import { IndianLanguage, UserRole } from '../types';
 import { PWAInstallButton } from './PWAInstallButton';
 import { 
-  PhoneCall, 
   Globe, 
-  UserCheck, 
   MapPin, 
   Zap, 
   Eye, 
   Type, 
   Menu, 
   X,
+  Phone,
   ShieldAlert,
   ChevronDown,
-  LocateFixed
+  LocateFixed,
+  UserCheck
 } from 'lucide-react';
 
 const INDIAN_LANGUAGES_LIST: { code: IndianLanguage; label: string; nativeName: string }[] = [
@@ -31,6 +31,15 @@ const INDIAN_LANGUAGES_LIST: { code: IndianLanguage; label: string; nativeName: 
   { code: 'or', label: 'Odia', nativeName: 'ଓଡ଼ିଆ' },
   { code: 'as', label: 'Assamese', nativeName: 'অসমীয়া' },
   { code: 'ur', label: 'Urdu', nativeName: 'اردو' },
+];
+
+const CITIES_LIST = [
+  { city: 'New Delhi', state: 'Delhi', pincode: '110001', district: 'Central Delhi', address: 'Connaught Place, Barakhamba Road' },
+  { city: 'Mumbai', state: 'Maharashtra', pincode: '400001', district: 'Mumbai South', address: 'Nariman Point & Fort Area' },
+  { city: 'Bengaluru', state: 'Karnataka', pincode: '560001', district: 'Bangalore Urban', address: 'MG Road & Indiranagar' },
+  { city: 'Chennai', state: 'Tamil Nadu', pincode: '600001', district: 'Chennai', address: 'George Town & Anna Salai' },
+  { city: 'Kolkata', state: 'West Bengal', pincode: '700001', district: 'Kolkata', address: 'Park Street & BBD Bagh' },
+  { city: 'Lucknow', state: 'Uttar Pradesh', pincode: '226001', district: 'Lucknow', address: 'Hazratganj & Gomti Nagar' },
 ];
 
 export const Header: React.FC = () => {
@@ -59,16 +68,8 @@ export const Header: React.FC = () => {
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const [accessDropdownOpen, setAccessDropdownOpen] = useState(false);
   const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
+  const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
   const [detectingGps, setDetectingGps] = useState(false);
-
-  const CITIES_LIST = [
-    { city: 'New Delhi', state: 'Delhi', pincode: '110001', district: 'Central Delhi', address: 'Connaught Place, Barakhamba Road' },
-    { city: 'Mumbai', state: 'Maharashtra', pincode: '400001', district: 'Mumbai South', address: 'Nariman Point & Fort Area' },
-    { city: 'Bengaluru', state: 'Karnataka', pincode: '560001', district: 'Bangalore Urban', address: 'MG Road & Indiranagar' },
-    { city: 'Chennai', state: 'Tamil Nadu', pincode: '600001', district: 'Chennai', address: 'George Town & Anna Salai' },
-    { city: 'Kolkata', state: 'West Bengal', pincode: '700001', district: 'Kolkata', address: 'Park Street & BBD Bagh' },
-    { city: 'Lucknow', state: 'Uttar Pradesh', pincode: '226001', district: 'Lucknow', address: 'Hazratganj & Gomti Nagar' },
-  ];
 
   const handleDetectGPS = () => {
     if (!('geolocation' in navigator)) {
@@ -80,68 +81,247 @@ export const Header: React.FC = () => {
       (pos) => {
         setDetectingGps(false);
         const { latitude, longitude } = pos.coords;
-        // In preview environments, simulate nearest metro coordinates match
         updateLocation({
           lat: latitude,
           lng: longitude,
           address: `GPS Pin (${latitude.toFixed(3)}°N, ${longitude.toFixed(3)}°E)`,
         });
-        showNotification(`GPS Location detected: (${latitude.toFixed(2)}, ${longitude.toFixed(2)}). Medical resources re-centered.`);
+        showNotification(`GPS detected (${latitude.toFixed(2)}, ${longitude.toFixed(2)}). Medical resources updated.`);
         setLocationDropdownOpen(false);
       },
-      (err) => {
+      () => {
         setDetectingGps(false);
-        showNotification('GPS access simulated: Re-centered on Delhi NCR health cluster.');
+        showNotification('GPS unavailable. Defaulting to Delhi NCR health cluster.');
       },
       { timeout: 8000 }
     );
   };
 
+  const navItems = [
+    { id: 'doctors', label: t.findDoctor },
+    { id: 'hospitals', label: t.findHospital },
+    { id: 'telemedicine', label: t.telemedicine },
+    { id: 'pharmacy', label: t.findPharmacy },
+    { id: 'records', label: t.healthRecords },
+    { id: 'healthguide', label: t.healthGuideAI },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200">
+      {/* Top Utility Bar */}
+      <div className="bg-slate-900 text-slate-300 text-xs px-4 sm:px-6 lg:px-8 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-9">
+          <div className="flex items-center gap-4 text-[11px]">
+            <span className="hidden sm:inline text-slate-400">
+              National Emergency Helplines:
+            </span>
+            <div className="flex items-center gap-3 font-medium text-slate-200">
+              <a href="tel:108" className="hover:text-white transition flex items-center gap-1">
+                <span className="text-red-400 font-bold">108</span> Ambulance
+              </a>
+              <span className="text-slate-600">|</span>
+              <a href="tel:112" className="hover:text-white transition flex items-center gap-1">
+                <span className="text-red-400 font-bold">112</span> All Emergencies
+              </a>
+              <span className="text-slate-600 hidden md:inline">|</span>
+              <a href="tel:14416" className="hidden md:inline hover:text-white transition">
+                <span className="text-sky-400 font-bold">14416</span> Tele-MANAS
+              </a>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 text-[11px]">
+            {/* Low Bandwidth 2G Toggle */}
+            <button
+              onClick={() => setLowBandwidth(!lowBandwidth)}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded transition cursor-pointer ${
+                lowBandwidth 
+                  ? 'bg-amber-600 text-white font-semibold' 
+                  : 'text-slate-300 hover:text-white'
+              }`}
+              title="Toggle low data usage mode for 2G / slow connections"
+            >
+              <Zap className="w-3 h-3" />
+              <span>{lowBandwidth ? '2G Mode Active' : '2G Mode'}</span>
+            </button>
+
+            {/* Accessibility dropdown trigger */}
+            <div className="relative">
+              <button
+                onClick={() => setAccessDropdownOpen(!accessDropdownOpen)}
+                className="text-slate-300 hover:text-white flex items-center gap-1 py-0.5 cursor-pointer"
+                title="Display settings"
+              >
+                <Type className="w-3 h-3" />
+                <span className="hidden sm:inline">Text & Contrast</span>
+                <ChevronDown className="w-2.5 h-2.5 opacity-60" />
+              </button>
+
+              {accessDropdownOpen && (
+                <div className="absolute right-0 mt-1.5 w-52 bg-white text-slate-900 rounded-md shadow-lg border border-slate-200 p-2.5 z-50 text-xs">
+                  <div className="pb-2 border-b border-slate-100 flex items-center justify-between">
+                    <span className="font-semibold text-slate-700">High Contrast</span>
+                    <button
+                      onClick={() => setHighContrast(!highContrast)}
+                      className={`px-2 py-0.5 rounded text-[11px] font-medium ${
+                        highContrast ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'
+                      }`}
+                    >
+                      {highContrast ? 'On' : 'Off'}
+                    </button>
+                  </div>
+                  <div className="pt-2">
+                    <span className="font-semibold text-slate-700 block mb-1.5">Text Size</span>
+                    <div className="grid grid-cols-3 gap-1">
+                      {(['normal', 'large', 'xlarge'] as const).map(s => (
+                        <button
+                          key={s}
+                          onClick={() => setTextSize(s)}
+                          className={`py-1 rounded text-[11px] font-medium ${
+                            textSize === s ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          }`}
+                        >
+                          {s === 'normal' ? 'Default' : s === 'large' ? 'Large' : 'XL'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Language Selector */}
+            <div className="relative">
+              <button
+                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                className="text-slate-300 hover:text-white flex items-center gap-1 py-0.5 cursor-pointer"
+                title="Change language"
+              >
+                <Globe className="w-3 h-3" />
+                <span>{INDIAN_LANGUAGES_LIST.find(l => l.code === language)?.nativeName || 'English'}</span>
+                <ChevronDown className="w-2.5 h-2.5 opacity-60" />
+              </button>
+
+              {langDropdownOpen && (
+                <div className="absolute right-0 mt-1.5 w-44 max-h-72 overflow-y-auto bg-white text-slate-900 rounded-md shadow-lg border border-slate-200 py-1 z-50 text-xs">
+                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 border-b border-slate-100">
+                    SELECT LANGUAGE
+                  </div>
+                  {INDIAN_LANGUAGES_LIST.map(lang => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setLanguage(lang.code);
+                        setLangDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-1.5 flex items-center justify-between text-xs hover:bg-slate-50 cursor-pointer ${
+                        language === lang.code ? 'font-bold text-sky-700 bg-sky-50' : 'text-slate-700'
+                      }`}
+                    >
+                      <span>{lang.nativeName}</span>
+                      <span className="text-[10px] text-slate-400">{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Portal View Switcher */}
+            <div className="relative">
+              <button
+                onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
+                className="text-slate-300 hover:text-white flex items-center gap-1 py-0.5 cursor-pointer"
+                title="Switch portal perspective"
+              >
+                <UserCheck className="w-3 h-3 text-slate-400" />
+                <span className="capitalize font-medium">{activeRole} Portal</span>
+                <ChevronDown className="w-2.5 h-2.5 opacity-60" />
+              </button>
+
+              {roleDropdownOpen && (
+                <div className="absolute right-0 mt-1.5 w-56 bg-white text-slate-900 rounded-md shadow-lg border border-slate-200 py-1 z-50 text-xs">
+                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 border-b border-slate-100">
+                    PORTAL VIEW
+                  </div>
+                  {[
+                    { role: 'patient' as UserRole, label: 'Citizen / Patient', desc: 'Appointments & health vault' },
+                    { role: 'doctor' as UserRole, label: 'Doctor / Physician', desc: 'OPD queue & digital Rx' },
+                    { role: 'hospital' as UserRole, label: 'Hospital Administration', desc: 'Beds, ICU & oxygen monitor' },
+                    { role: 'pharmacy' as UserRole, label: 'Pharmacy Staff', desc: 'Jan Aushadhi & Rx verify' },
+                    { role: 'admin' as UserRole, label: 'Platform Administrator', desc: 'Practitioner verification & audit' },
+                  ].map(r => (
+                    <button
+                      key={r.role}
+                      onClick={() => {
+                        switchRole(r.role);
+                        setRoleDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-50 cursor-pointer ${
+                        activeRole === r.role ? 'bg-sky-50 font-semibold text-sky-800' : 'text-slate-700'
+                      }`}
+                    >
+                      <p className="font-medium">{r.label}</p>
+                      <p className="text-[10px] text-slate-400 font-normal">{r.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation Row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           
-          {/* Zone 1: Single text element wordmark */}
-          <div className="flex items-center gap-3">
+          {/* Brand & Location */}
+          <div className="flex items-center gap-4">
             <button 
               onClick={() => setActiveTab('home')}
-              className="text-left group cursor-pointer focus:outline-hidden"
+              className="text-left cursor-pointer focus:outline-hidden"
             >
-              <span className="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-sky-700 transition-colors">
-                {t.brandName}
-              </span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl font-bold tracking-tight text-slate-900">
+                  {t.brandName}
+                </span>
+                <span className="text-[10px] font-semibold text-sky-800 uppercase tracking-wider hidden sm:inline">
+                  National Health
+                </span>
+              </div>
             </button>
-            
-            {/* Interactive Location Dropdown Tag */}
+
+            {/* Location selector button */}
             <div className="relative">
               <button 
                 onClick={() => setLocationDropdownOpen(!locationDropdownOpen)}
-                className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 pl-3 border-l border-slate-200 hover:text-slate-900 transition-colors cursor-pointer py-1"
-                title="Change city or auto-detect current GPS location"
+                className="flex items-center gap-1.5 text-xs text-slate-600 pl-3 border-l border-slate-200 hover:text-slate-900 py-1 transition cursor-pointer"
+                title="Change city or auto-detect GPS location"
               >
-                <MapPin className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                <span className="font-semibold text-slate-800">{user?.location.city || 'New Delhi'}</span>
-                <span className="text-slate-400">({user?.location.pincode || '110001'})</span>
-                <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+                <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span className="font-medium text-slate-800">{user?.location.city || 'New Delhi'}</span>
+                <span className="text-slate-400 font-mono text-[11px]">({user?.location.pincode || '110001'})</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
               </button>
 
               {locationDropdownOpen && (
-                <div className="absolute left-3 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 text-xs">
+                <div className="absolute left-3 mt-2 w-64 bg-white text-slate-900 rounded-md shadow-lg border border-slate-200 py-2 z-50 text-xs">
                   <div className="px-3 pb-2 border-b border-slate-100 flex items-center justify-between">
-                    <span className="font-bold text-slate-900">Your Location</span>
+                    <span className="font-semibold text-slate-800">Your Location</span>
                     <button
                       onClick={handleDetectGPS}
                       disabled={detectingGps}
-                      className="text-sky-700 hover:text-sky-900 font-bold flex items-center gap-1 cursor-pointer disabled:opacity-50 text-[11px]"
+                      className="text-sky-700 hover:text-sky-900 font-medium flex items-center gap-1 cursor-pointer disabled:opacity-50 text-[11px]"
                     >
-                      <LocateFixed className={`w-3.5 h-3.5 ${detectingGps ? 'animate-spin' : ''}`} />
-                      <span>{detectingGps ? 'Detecting...' : 'Auto GPS'}</span>
+                      <LocateFixed className={`w-3 h-3 ${detectingGps ? 'animate-spin' : ''}`} />
+                      <span>{detectingGps ? 'Locating...' : 'Use GPS'}</span>
                     </button>
                   </div>
 
                   <div className="py-1 max-h-56 overflow-y-auto">
-                    <p className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase">Select Indian City</p>
+                    <p className="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
+                      Select City
+                    </p>
                     {CITIES_LIST.map(item => (
                       <button
                         key={item.city}
@@ -149,13 +329,13 @@ export const Header: React.FC = () => {
                           updateLocation(item);
                           setLocationDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-slate-50 transition cursor-pointer ${
-                          user?.location.city === item.city ? 'bg-sky-50 text-sky-800 font-bold' : 'text-slate-700'
+                        className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-slate-50 transition cursor-pointer ${
+                          user?.location.city === item.city ? 'bg-sky-50 text-sky-800 font-semibold' : 'text-slate-700'
                         }`}
                       >
                         <div>
                           <p className="text-xs">{item.city}</p>
-                          <p className="text-[10px] text-slate-400 font-normal">{item.state}</p>
+                          <p className="text-[10px] text-slate-400">{item.state}</p>
                         </div>
                         <span className="font-mono text-[10px] text-slate-400">{item.pincode}</span>
                       </button>
@@ -166,199 +346,81 @@ export const Header: React.FC = () => {
             </div>
           </div>
 
-          {/* Zone 2: 4-6 clean text navigation links */}
-          <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <button 
-              onClick={() => setActiveTab('doctors')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap cursor-pointer ${activeTab === 'doctors' ? 'text-sky-700 font-semibold border-b-2 border-sky-600 pb-0.5' : ''}`}
-            >
-              {t.findDoctor}
-            </button>
-            <button 
-              onClick={() => setActiveTab('hospitals')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap cursor-pointer ${activeTab === 'hospitals' ? 'text-sky-700 font-semibold border-b-2 border-sky-600 pb-0.5' : ''}`}
-            >
-              {t.findHospital}
-            </button>
-            <button 
-              onClick={() => setActiveTab('telemedicine')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap cursor-pointer ${activeTab === 'telemedicine' ? 'text-sky-700 font-semibold border-b-2 border-sky-600 pb-0.5' : ''}`}
-            >
-              {t.telemedicine}
-            </button>
-            <button 
-              onClick={() => setActiveTab('pharmacy')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap cursor-pointer ${activeTab === 'pharmacy' ? 'text-sky-700 font-semibold border-b-2 border-sky-600 pb-0.5' : ''}`}
-            >
-              {t.findPharmacy}
-            </button>
-            <button 
-              onClick={() => setActiveTab('records')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap cursor-pointer ${activeTab === 'records' ? 'text-sky-700 font-semibold border-b-2 border-sky-600 pb-0.5' : ''}`}
-            >
-              {t.healthRecords}
-            </button>
-            <button 
-              onClick={() => setActiveTab('healthguide')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap cursor-pointer ${activeTab === 'healthguide' ? 'text-sky-700 font-semibold border-b-2 border-sky-600 pb-0.5' : ''}`}
-            >
-              {t.healthGuideAI}
-            </button>
+          {/* Primary Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-5 text-xs font-medium text-slate-600">
+            {navItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id as any)}
+                className={`py-1 hover:text-slate-900 transition-colors whitespace-nowrap cursor-pointer ${
+                  activeTab === item.id 
+                    ? 'text-sky-800 font-semibold border-b-2 border-sky-800' 
+                    : 'text-slate-600'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+
+            {/* More Services Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
+                className={`py-1 hover:text-slate-900 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer ${
+                  ['labs', 'blood', 'reminders', 'schemes'].includes(activeTab)
+                    ? 'text-sky-800 font-semibold border-b-2 border-sky-800'
+                    : 'text-slate-600'
+                }`}
+              >
+                <span>More</span>
+                <ChevronDown className="w-3 h-3 opacity-60" />
+              </button>
+
+              {moreDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-slate-200 py-1.5 z-50 text-xs">
+                  {[
+                    { id: 'labs', label: t.findLabs },
+                    { id: 'blood', label: t.bloodBanks },
+                    { id: 'reminders', label: t.medReminders },
+                    { id: 'schemes', label: t.govtSchemes },
+                  ].map(m => (
+                    <button
+                      key={m.id}
+                      onClick={() => {
+                        setActiveTab(m.id as any);
+                        setMoreDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-3.5 py-1.5 hover:bg-slate-50 cursor-pointer ${
+                        activeTab === m.id ? 'bg-sky-50 text-sky-800 font-semibold' : 'text-slate-700'
+                      }`}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
 
-          {/* Zone 3: Primary Actions (Urgent Emergency CTA + Language + Accessibility + Role Switcher) */}
+          {/* Right Action: PWA + High Visibility Emergency Help */}
           <div className="flex items-center gap-2.5">
-            
-            {/* PWA Install Button */}
             <div className="hidden md:block">
               <PWAInstallButton />
             </div>
 
-            {/* Accessibility & Low Bandwidth Controls */}
-            <div className="relative">
-              <button
-                onClick={() => setAccessDropdownOpen(!accessDropdownOpen)}
-                className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
-                title="Accessibility & 2G Data Saver settings"
-                aria-label="Accessibility settings"
-              >
-                <Zap className={`w-4 h-4 ${lowBandwidth ? 'text-amber-600 fill-amber-500' : ''}`} />
-              </button>
-
-              {accessDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 py-3 px-3 z-50 text-xs">
-                  <p className="font-bold text-slate-900 mb-2 pb-1 border-b border-slate-100">Accessibility & Network</p>
-                  
-                  {/* Low Data Saver */}
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-slate-700 font-medium">Low-Bandwidth (2G)</span>
-                    <button
-                      onClick={() => setLowBandwidth(!lowBandwidth)}
-                      className={`px-2.5 py-1 rounded-md font-semibold text-[11px] transition-colors ${lowBandwidth ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-                    >
-                      {lowBandwidth ? 'Active' : 'Off'}
-                    </button>
-                  </div>
-
-                  {/* High Contrast */}
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-slate-700 font-medium">High Contrast</span>
-                    <button
-                      onClick={() => setHighContrast(!highContrast)}
-                      className={`px-2.5 py-1 rounded-md font-semibold text-[11px] transition-colors ${highContrast ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-                    >
-                      {highContrast ? 'Active' : 'Off'}
-                    </button>
-                  </div>
-
-                  {/* Text Size Scale */}
-                  <div className="pt-2 border-t border-slate-100">
-                    <p className="text-slate-600 mb-1.5 font-medium">Text Scale</p>
-                    <div className="grid grid-cols-3 gap-1">
-                      {(['normal', 'large', 'xlarge'] as const).map(s => (
-                        <button
-                          key={s}
-                          onClick={() => setTextSize(s)}
-                          className={`py-1 rounded-md text-[11px] font-medium transition ${textSize === s ? 'bg-sky-700 text-white font-semibold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-                        >
-                          {s === 'normal' ? 'Standard' : s === 'large' ? 'Large' : 'XL'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Language Selector (13 Indian Languages) */}
-            <div className="relative">
-              <button
-                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer min-h-[44px]"
-                aria-label="Select language"
-              >
-                <Globe className="w-4 h-4 text-sky-600" />
-                <span className="hidden sm:inline">{INDIAN_LANGUAGES_LIST.find(l => l.code === language)?.nativeName || 'English'}</span>
-                <ChevronDown className="w-3 h-3 text-slate-400" />
-              </button>
-
-              {langDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-52 max-h-80 overflow-y-auto bg-white rounded-xl shadow-xl border border-slate-200 py-1 z-50">
-                  <div className="px-3 py-1.5 text-[11px] font-bold text-slate-400 border-b border-slate-100">
-                    SELECT LANGUAGE / भाषा चुनें
-                  </div>
-                  {INDIAN_LANGUAGES_LIST.map(lang => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        setLanguage(lang.code);
-                        setLangDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between transition-colors ${language === lang.code ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-                    >
-                      <span>{lang.nativeName}</span>
-                      <span className="text-[11px] text-slate-400 font-normal">{lang.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Role Portal Switcher */}
-            <div className="relative">
-              <button
-                onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer min-h-[44px]"
-                title="Switch between Citizen, Doctor, Hospital, Pharmacy, Admin portals"
-              >
-                <UserCheck className="w-4 h-4 text-slate-600" />
-                <span className="capitalize hidden sm:inline">{activeRole}</span>
-                <ChevronDown className="w-3 h-3 text-slate-400" />
-              </button>
-
-              {roleDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50">
-                  <div className="px-3 py-1.5 text-[11px] font-bold text-slate-400 border-b border-slate-100">
-                    SWITCH PLATFORM ROLE
-                  </div>
-                  {[
-                    { role: 'patient' as UserRole, label: 'Citizen / Patient', desc: 'Appointments, PHR, Family, SOS' },
-                    { role: 'doctor' as UserRole, label: 'Doctor / Physician', desc: 'OPD Queue, Rx Writer, Consults' },
-                    { role: 'hospital' as UserRole, label: 'Hospital Admin', desc: 'ICU Beds, Oxygen, Casualty' },
-                    { role: 'pharmacy' as UserRole, label: 'Pharmacy Staff', desc: 'Jan Aushadhi, Rx Verification' },
-                    { role: 'admin' as UserRole, label: 'Platform Medical Admin', desc: 'Doctor License Verification & Logs' },
-                  ].map(r => (
-                    <button
-                      key={r.role}
-                      onClick={() => {
-                        switchRole(r.role);
-                        setRoleDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-xs transition-colors ${activeRole === r.role ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-                    >
-                      <p className="font-semibold">{r.label}</p>
-                      <p className="text-[10px] text-slate-400 font-normal">{r.desc}</p>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Prominent High-Visibility Emergency Help Button */}
             <button
               onClick={() => setIsEmergencyModalOpen(true)}
-              className="px-3.5 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 rounded-lg shadow-sm transition-all flex items-center gap-1.5 whitespace-nowrap min-h-[44px] cursor-pointer"
-              title="Immediate medical emergency guidance & 108/112 dial"
+              className="px-3 py-1.5 text-xs font-bold text-white bg-red-700 hover:bg-red-800 active:bg-red-900 rounded transition cursor-pointer flex items-center gap-1.5 tracking-tight btn-press"
             >
-              <ShieldAlert className="w-4 h-4 animate-pulse" />
-              <span className="tracking-wide">{t.emergencyHelp}</span>
+              <Phone className="w-3.5 h-3.5 fill-white shrink-0" />
+              <span>EMERGENCY 108</span>
             </button>
 
             {/* Mobile menu trigger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
-              aria-label="Toggle navigation menu"
+              className="lg:hidden p-1.5 text-slate-600 hover:text-slate-900 rounded cursor-pointer"
+              aria-label="Toggle navigation"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -366,75 +428,47 @@ export const Header: React.FC = () => {
 
         </div>
 
-        {/* Mobile Navigation Dropdown */}
+        {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-100 py-3 space-y-1">
+          <div className="lg:hidden border-t border-slate-200 py-2 space-y-1">
             <button
               onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'home' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
+              className={`w-full text-left px-3 py-2 text-xs font-medium rounded ${
+                activeTab === 'home' ? 'bg-sky-50 text-sky-800 font-semibold' : 'text-slate-700 hover:bg-slate-50'
+              }`}
             >
               Home Overview
             </button>
-            <button
-              onClick={() => { setActiveTab('doctors'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'doctors' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {t.findDoctor}
-            </button>
-            <button
-              onClick={() => { setActiveTab('hospitals'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'hospitals' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {t.findHospital}
-            </button>
-            <button
-              onClick={() => { setActiveTab('telemedicine'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'telemedicine' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {t.telemedicine}
-            </button>
-            <button
-              onClick={() => { setActiveTab('pharmacy'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'pharmacy' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {t.findPharmacy}
-            </button>
-            <button
-              onClick={() => { setActiveTab('labs'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'labs' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {t.findLabs}
-            </button>
-            <button
-              onClick={() => { setActiveTab('blood'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'blood' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {t.bloodBanks}
-            </button>
-            <button
-              onClick={() => { setActiveTab('records'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'records' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {t.healthRecords}
-            </button>
-            <button
-              onClick={() => { setActiveTab('reminders'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'reminders' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {t.medReminders}
-            </button>
-            <button
-              onClick={() => { setActiveTab('schemes'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'schemes' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {t.govtSchemes}
-            </button>
-            <button
-              onClick={() => { setActiveTab('healthguide'); setMobileMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium ${activeTab === 'healthguide' ? 'bg-sky-50 text-sky-700 font-bold' : 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {t.healthGuideAI}
-            </button>
+            {navItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => { setActiveTab(item.id as any); setMobileMenuOpen(false); }}
+                className={`w-full text-left px-3 py-2 text-xs font-medium rounded ${
+                  activeTab === item.id ? 'bg-sky-50 text-sky-800 font-semibold' : 'text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+            {[
+              { id: 'labs', label: t.findLabs },
+              { id: 'blood', label: t.bloodBanks },
+              { id: 'reminders', label: t.medReminders },
+              { id: 'schemes', label: t.govtSchemes },
+            ].map(item => (
+              <button
+                key={item.id}
+                onClick={() => { setActiveTab(item.id as any); setMobileMenuOpen(false); }}
+                className={`w-full text-left px-3 py-2 text-xs font-medium rounded ${
+                  activeTab === item.id ? 'bg-sky-50 text-sky-800 font-semibold' : 'text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between px-3">
+              <PWAInstallButton />
+            </div>
           </div>
         )}
 

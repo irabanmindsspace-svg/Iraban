@@ -130,27 +130,27 @@ export const InteractiveMap: React.FC = () => {
   });
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
       {/* Map Control Header */}
-      <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+      <div className="p-3.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50">
         <div className="flex items-center gap-2">
-          <Compass className="w-5 h-5 text-sky-600 animate-spin-slow" />
+          <Compass className="w-4 h-4 text-sky-700" />
           <div>
-            <h3 className="text-sm font-bold text-slate-900">Live Healthcare Geo-Locator</h3>
+            <h3 className="text-xs font-bold text-slate-900">Healthcare Facility Map</h3>
             <p className="text-[11px] text-slate-500">
-              Center: {user?.location.city || 'New Delhi'} ({user?.location.pincode || '110001'}) · Live radar active
+              Coverage: {user?.location.city || 'New Delhi'} ({user?.location.pincode || '110001'})
             </p>
           </div>
         </div>
 
         {/* Filter controls */}
         <div className="flex flex-wrap items-center gap-2 text-xs">
-          <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200">
+          <div className="flex items-center gap-1 bg-white p-0.5 rounded border border-slate-200">
             {(['all', 'hospital', 'ambulance', 'pharmacy'] as const).map(type => (
               <button
                 key={type}
                 onClick={() => setActiveFilter(type)}
-                className={`px-2.5 py-1 rounded-lg font-semibold capitalize transition cursor-pointer text-[11px] ${
+                className={`px-2 py-1 rounded font-medium capitalize transition cursor-pointer text-[11px] btn-press ${
                   activeFilter === type ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -163,7 +163,7 @@ export const InteractiveMap: React.FC = () => {
           <select
             value={selectedRadius}
             onChange={e => setSelectedRadius(parseInt(e.target.value, 10))}
-            className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-[11px] font-semibold text-slate-700"
+            className="px-2 py-1 rounded border border-slate-200 bg-white text-[11px] font-medium text-slate-700"
           >
             <option value={2}>Within 2 km</option>
             <option value={5}>Within 5 km</option>

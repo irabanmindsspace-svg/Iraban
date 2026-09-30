@@ -22,11 +22,11 @@ export const OfflineIndicator: React.FC = () => {
   if (isOnline) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2.5 rounded-xl bg-amber-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xl animate-bounce">
-      <WifiOff className="w-4 h-4 shrink-0" />
+    <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2.5 rounded bg-amber-800 px-3.5 py-2.5 text-xs font-medium text-white shadow-lg border border-amber-900 max-w-sm">
+      <WifiOff className="w-4 h-4 shrink-0 text-amber-200" />
       <div>
-        <p>Offline Mode Active</p>
-        <p className="text-[11px] font-normal text-amber-100">Emergency numbers (108/112) & local first-aid guides are cached.</p>
+        <p className="font-semibold text-white">Offline Mode</p>
+        <p className="text-[11px] text-amber-100">Emergency hotlines and first-aid protocols remain available offline.</p>
       </div>
     </div>
   );

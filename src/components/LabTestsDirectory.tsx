@@ -36,34 +36,34 @@ export const LabTestsDirectory: React.FC = () => {
     : tests.filter(t => t.category === selectedCategory);
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-5">
       
       {/* Header */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+      <div className="bg-white rounded-lg p-5 border border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
           <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
+            <h1 className="text-lg font-bold text-slate-900 tracking-tight">
               Diagnostic Laboratories & Health Packages
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              NABL accredited diagnostic centers, home sample collection, and subsidized blood test pricing.
+            <p className="text-xs text-slate-500 mt-0.5">
+              NABL accredited diagnostic centers, home sample collection, and subsidized lab test pricing.
             </p>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-sky-800 bg-sky-50 px-3 py-1.5 rounded-xl border border-sky-200">
-            <ShieldCheck className="w-4 h-4 text-sky-600" />
+          <div className="flex items-center gap-1.5 text-xs text-slate-700 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
+            <ShieldCheck className="w-4 h-4 text-emerald-700" />
             <span>NABL Certified Quality Standards</span>
           </div>
         </div>
 
         {/* Filter categories */}
-        <div className="mt-4 flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="text-slate-400 font-medium mr-1">Category:</span>
+        <div className="mt-3.5 flex flex-wrap items-center gap-1.5 text-xs">
+          <span className="text-slate-500 font-medium mr-1 text-[11px]">Category:</span>
           {['all', 'Pathology', 'Diabetes', 'Cardiology', 'Radiology'].map(cat => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer capitalize ${selectedCategory === cat ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+              className={`px-2.5 py-1 rounded font-medium transition cursor-pointer capitalize text-xs btn-press ${selectedCategory === cat ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
             >
               {cat}
             </button>
@@ -73,58 +73,58 @@ export const LabTestsDirectory: React.FC = () => {
 
       {/* Tests Grid */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-slate-900">
-            Standard Pathology & Radiology Tests ({filteredTests.length})
-          </h2>
+        <div className="flex items-center justify-between mb-3 text-xs text-slate-500">
+          <span>
+            Standard Pathology & Radiology Tests (<strong className="text-slate-900 font-semibold">{filteredTests.length}</strong>)
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {filteredTests.map(test => (
             <div
               key={test.id}
-              className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-slate-300 transition shadow-xs flex flex-col justify-between"
+              className="bg-white rounded-lg p-4 border border-slate-200 hover:border-slate-300 transition flex flex-col justify-between space-y-3"
             >
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <span className="text-[10px] font-bold text-sky-700 uppercase tracking-wide">
+                    <span className="text-[10px] font-semibold text-sky-800 uppercase tracking-wide">
                       {test.category}
                     </span>
                     <h3 className="text-sm font-bold text-slate-900 mt-0.5">{test.name}</h3>
                   </div>
-                  <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-md border border-emerald-100 shrink-0">
+                  <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 font-semibold text-xs rounded border border-emerald-200 shrink-0 tabular-nums">
                     ₹{test.subsidizedPrice}
                   </span>
                 </div>
 
-                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
                   {test.description}
                 </p>
 
-                <div className="mt-3.5 pt-2.5 border-t border-slate-100 space-y-1 text-[11px] text-slate-600">
+                <div className="mt-3 pt-2.5 border-t border-slate-100 space-y-1 text-xs text-slate-600">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Sample Type:</span>
-                    <span className="font-semibold text-slate-800">{test.sampleType}</span>
+                    <span className="text-slate-400 text-[11px]">Sample Type:</span>
+                    <span className="font-medium text-slate-800">{test.sampleType}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Fasting Needed:</span>
-                    <span className="font-semibold text-slate-800">
-                      {test.fastingHoursRequired > 0 ? `${test.fastingHoursRequired} Hours Fasting` : 'No Fasting Required'}
+                    <span className="text-slate-400 text-[11px]">Fasting Needed:</span>
+                    <span className="font-medium text-slate-800">
+                      {test.fastingHoursRequired > 0 ? `${test.fastingHoursRequired} Hours Fasting` : 'No Fasting'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Report Turnaround:</span>
-                    <span className="font-semibold text-sky-700">{test.turnaroundTime}</span>
+                    <span className="text-slate-400 text-[11px]">Turnaround:</span>
+                    <span className="font-semibold text-sky-800">{test.turnaroundTime}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] text-slate-400 line-through">MRP: ₹{test.marketPrice}</span>
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-slate-400 line-through text-[11px]">MRP: ₹{test.marketPrice}</span>
                 <button
                   onClick={() => showNotification(`Home collection request placed for ${test.name}. Technician will contact shortly.`)}
-                  className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                  className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded font-medium text-xs flex items-center gap-1.5 transition cursor-pointer btn-press"
                 >
                   <Home className="w-3.5 h-3.5" />
                   <span>Book Home Sample</span>

@@ -42,103 +42,103 @@ export const HospitalAdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-5">
       
       {/* Title */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+      <div className="bg-white rounded-lg p-5 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-lg font-bold tracking-tight text-slate-900">
                 Hospital Administration & Capacity Monitor
               </h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-900 text-white rounded-md">
-                Organization Portal
+              <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-900 text-white rounded">
+                Hospital Portal
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 mt-0.5">
               {hospital?.name || 'All India Institute of Medical Sciences (AIIMS)'} · Ansari Nagar, New Delhi
             </p>
           </div>
 
-          <span className="text-xs font-semibold px-3 py-1 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200">
+          <span className="text-xs font-medium px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded border border-emerald-200">
             NABH Accredited & Ayushman Bharat Empanelled
           </span>
         </div>
       </div>
 
       {/* Real-time Capacity Update Form */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
-        <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-          <Activity className="w-5 h-5 text-sky-600" />
-          <span>Update Real-Time Facility Availability (Broadcast to Emergency 108)</span>
+      <div className="bg-white rounded-lg p-5 border border-slate-200 space-y-4">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+          <Activity className="w-4 h-4 text-sky-800" />
+          <span>Facility Live Capacity (Broadcast to 108 Emergency Network)</span>
         </h2>
 
         <form onSubmit={handleSaveCapacity} className="space-y-4 text-xs">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
-                <Bed className="w-4 h-4 text-sky-600" />
+              <label className="block font-semibold text-slate-900 mb-1 flex items-center gap-1.5">
+                <Bed className="w-4 h-4 text-sky-800" />
                 <span>Available General Beds</span>
               </label>
               <input
                 type="number"
                 value={availableBeds}
                 onChange={e => setAvailableBeds(parseInt(e.target.value, 10))}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900"
+                className="w-full px-2.5 py-1.5 rounded border border-slate-300 text-slate-900 focus:border-sky-600 focus:outline-hidden"
               />
-              <span className="text-[10px] text-slate-400 mt-1 block">Total Sanctioned: 2478 Beds</span>
+              <span className="text-[10px] text-slate-400 mt-1 block">Total Sanctioned: 2,478 Beds</span>
             </div>
 
             <div>
-              <label className="block font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
-                <Activity className="w-4 h-4 text-rose-600" />
+              <label className="block font-semibold text-slate-900 mb-1 flex items-center gap-1.5">
+                <Activity className="w-4 h-4 text-red-700" />
                 <span>Available ICU / Ventilator Beds</span>
               </label>
               <input
                 type="number"
                 value={icuBeds}
                 onChange={e => setIcuBeds(parseInt(e.target.value, 10))}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900"
+                className="w-full px-2.5 py-1.5 rounded border border-slate-300 text-slate-900 focus:border-sky-600 focus:outline-hidden"
               />
               <span className="text-[10px] text-slate-400 mt-1 block">Critical Care ICU Units</span>
             </div>
 
             <div>
-              <label className="block font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
-                <Ambulance className="w-4 h-4 text-amber-600" />
+              <label className="block font-semibold text-slate-900 mb-1 flex items-center gap-1.5">
+                <Ambulance className="w-4 h-4 text-amber-700" />
                 <span>Ambulances on Standby</span>
               </label>
               <input
                 type="number"
                 value={ambulances}
                 onChange={e => setAmbulances(parseInt(e.target.value, 10))}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900"
+                className="w-full px-2.5 py-1.5 rounded border border-slate-300 text-slate-900 focus:border-sky-600 focus:outline-hidden"
               />
               <span className="text-[10px] text-slate-400 mt-1 block">ALS & BLS Emergency Fleet</span>
             </div>
           </div>
 
           <div>
-            <label className="block font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
-              <Wind className="w-4 h-4 text-emerald-600" />
+            <label className="block font-semibold text-slate-900 mb-1 flex items-center gap-1.5">
+              <Wind className="w-4 h-4 text-emerald-700" />
               <span>Oxygen Generation Plant Status</span>
             </label>
             <input
               type="text"
               value={oxygenPlant}
               onChange={e => setOxygenPlant(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900"
+              className="w-full px-2.5 py-1.5 rounded border border-slate-300 text-slate-900 focus:border-sky-600 focus:outline-hidden"
             />
           </div>
 
           <div className="pt-2 flex justify-end">
             <button
               type="submit"
-              className="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition cursor-pointer"
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded flex items-center gap-1.5 transition cursor-pointer btn-press"
             >
               <Save className="w-4 h-4" />
-              <span>Publish Real-Time Availability</span>
+              <span>Broadcast Capacity Status</span>
             </button>
           </div>
         </form>

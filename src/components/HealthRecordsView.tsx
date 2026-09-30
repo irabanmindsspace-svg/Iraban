@@ -91,45 +91,45 @@ export const HealthRecordsView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-5">
       
       {/* Title & Vault Header */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+      <div className="bg-white rounded-lg p-5 border border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-lg font-bold text-slate-900 tracking-tight">
                 Personal Health Records (PHR)
               </h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded-md">
+              <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded border border-emerald-200">
                 ABHA / DISHA Compliant
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Encrypted vault for lab tests, digital prescriptions, CT/MRI scans, and granular sharing consents.
+            <p className="text-xs text-slate-500 mt-0.5">
+              Secure vault for diagnostic reports, doctor prescriptions, imaging scans, and access consents.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowUploadModal(true)}
-              className="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition cursor-pointer min-h-[44px]"
+              className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded flex items-center gap-1.5 transition cursor-pointer btn-press"
             >
-              <Upload className="w-4 h-4" />
+              <Upload className="w-3.5 h-3.5" />
               <span>Upload Document</span>
             </button>
           </div>
         </div>
 
         {/* Family Member Vault Switcher */}
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-          <span className="text-slate-400 font-medium mr-1 flex items-center gap-1">
-            <Users className="w-3.5 h-3.5" /> Viewing records for:
+        <div className="mt-3.5 flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-slate-500 font-medium mr-1 flex items-center gap-1 text-[11px]">
+            <Users className="w-3.5 h-3.5 text-slate-400" /> Member:
           </span>
 
           <button
             onClick={() => setSelectedDependent('self')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${selectedDependent === 'self' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+            className={`px-2.5 py-1 rounded font-medium transition cursor-pointer text-xs btn-press ${selectedDependent === 'self' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
           >
             {user?.fullName || 'Rajesh Sharma'} (Self)
           </button>
@@ -138,7 +138,7 @@ export const HealthRecordsView: React.FC = () => {
             <button
               key={d.id}
               onClick={() => setSelectedDependent(d.id)}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${selectedDependent === d.id ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+              className={`px-2.5 py-1 rounded font-medium transition cursor-pointer text-xs btn-press ${selectedDependent === d.id ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
             >
               {d.fullName} ({d.relation})
             </button>
@@ -148,54 +148,55 @@ export const HealthRecordsView: React.FC = () => {
 
       {/* Records List */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-xs sm:text-sm font-medium text-slate-500">
-            Vault contains <strong className="text-slate-900 font-bold tabular-nums">{records.length}</strong> encrypted documents
-          </p>
+        <div className="flex items-center justify-between mb-3 text-xs text-slate-500">
+          <span>
+            Stored Medical Documents (<strong className="text-slate-900 font-semibold tabular-nums">{records.length}</strong>)
+          </span>
         </div>
 
         {loading ? (
-          <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 text-slate-400 text-sm">
+          <div className="p-8 text-center bg-white rounded-lg border border-slate-200 text-slate-500 text-xs">
             Loading encrypted personal health records...
           </div>
         ) : records.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 text-slate-500 text-sm">
-            No medical documents stored yet. Click &quot;Upload Document&quot; above to store your first report.
+          <div className="p-8 text-center bg-white rounded-lg border border-slate-200 text-slate-500 text-xs space-y-1">
+            <p className="font-semibold text-slate-800">No medical documents stored yet.</p>
+            <p className="text-[11px] text-slate-400">Click &quot;Upload Document&quot; above to store your first report.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {records.map(record => (
               <div
                 key={record.id}
-                className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-slate-300 transition-all shadow-xs"
+                className="bg-white rounded-lg p-4 sm:p-5 border border-slate-200 hover:border-slate-300 transition"
               >
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   {/* Left details */}
-                  <div className="flex items-start gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
-                      <FileText className="w-5 h-5" />
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 mt-0.5">
+                      <FileText className="w-4 h-4 text-sky-800" />
                     </div>
 
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-base font-bold text-slate-900">{record.title}</h3>
-                        <span className="text-[10px] font-semibold uppercase px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">
+                        <h3 className="text-sm font-bold text-slate-900">{record.title}</h3>
+                        <span className="text-[10px] font-medium uppercase px-2 py-0.5 bg-slate-100 text-slate-600 rounded">
                           {record.category.replace('_', ' ')}
                         </span>
                       </div>
 
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
                         <span>Issued by: {record.doctorOrLab}</span>
-                        <span aria-hidden="true">·</span>
+                        <span aria-hidden="true" className="text-slate-300">·</span>
                         <span>Date: {record.date}</span>
-                        <span aria-hidden="true">·</span>
+                        <span aria-hidden="true" className="text-slate-300">·</span>
                         <span>{record.fileSize}</span>
                       </div>
 
                       {/* Tags */}
                       <div className="mt-2 flex flex-wrap items-center gap-1.5">
                         {record.tags.map((t, idx) => (
-                          <span key={idx} className="text-[11px] font-medium text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
+                          <span key={idx} className="text-[11px] text-slate-600 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
                             {t}
                           </span>
                         ))}
@@ -204,14 +205,14 @@ export const HealthRecordsView: React.FC = () => {
                   </div>
 
                   {/* Right actions: Consent Manager */}
-                  <div className="flex flex-col items-end gap-2 shrink-0">
+                  <div className="flex flex-col sm:items-end gap-2 shrink-0">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleToggleRevoke(record)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                        className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition cursor-pointer btn-press ${
                           record.consent.revoked 
-                            ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' 
-                            : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                            ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200' 
+                            : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
                         }`}
                         title="Control whether doctors can access this record"
                       >
@@ -225,7 +226,7 @@ export const HealthRecordsView: React.FC = () => {
                           e.preventDefault();
                           showNotification(`Document ${record.fileName} ready for secure local view.`);
                         }}
-                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1"
+                        className="px-2.5 py-1 rounded text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1 btn-press"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>View</span>
@@ -233,20 +234,20 @@ export const HealthRecordsView: React.FC = () => {
                     </div>
 
                     <span className="text-[10px] text-slate-400">
-                      {record.consent.revoked ? '🔒 Private (Only you can view)' : '🔓 Visible to treating doctors'}
+                      {record.consent.revoked ? 'Private (Only you can view)' : 'Visible to consulting clinicians'}
                     </span>
                   </div>
                 </div>
 
                 {/* Audit trail */}
                 {record.accessLogs.length > 0 && (
-                  <div className="mt-3.5 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+                  <div className="mt-3 pt-2.5 border-t border-slate-100 text-xs text-slate-500">
                     <div className="flex items-center gap-1.5 font-medium text-slate-600 mb-1">
                       <History className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Access Audit Trail (DISHA Compliance):</span>
+                      <span>Access Log (DISHA Audit):</span>
                     </div>
                     {record.accessLogs.map((log, i) => (
-                      <p key={i} className="text-slate-400">
+                      <p key={i} className="text-slate-500 text-[11px]">
                         • {log.accessedAt}: {log.actorName} ({log.actorRole}) - &quot;{log.action}&quot;
                       </p>
                     ))}
@@ -261,30 +262,30 @@ export const HealthRecordsView: React.FC = () => {
       {/* Upload Document Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-            <h3 className="text-base font-bold text-slate-900 pb-3 border-b border-slate-100">
+          <div className="bg-white rounded-lg max-w-md w-full p-5 shadow-xl border border-slate-200">
+            <h3 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100">
               Upload Medical Health Document
             </h3>
 
-            <form onSubmit={handleUploadSubmit} className="mt-4 space-y-3.5 text-xs">
+            <form onSubmit={handleUploadSubmit} className="mt-3.5 space-y-3 text-xs">
               <div>
-                <label className="block font-bold text-slate-900 mb-1">Document Title</label>
+                <label className="block font-semibold text-slate-800 mb-1">Document Title</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={e => setNewTitle(e.target.value)}
                   placeholder="e.g. Thyroid Profile, Ultrasound Abdomen, Discharge Summary..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-3 py-1.5 rounded border border-slate-300 text-slate-900 focus:border-sky-600 focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-900 mb-1">Category</label>
+                <label className="block font-semibold text-slate-800 mb-1">Category</label>
                 <select
                   value={newCategory}
                   onChange={e => setNewCategory(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900 bg-white"
+                  className="w-full px-2.5 py-1.5 rounded border border-slate-300 text-slate-900 bg-white"
                 >
                   <option value="lab_report">Lab Test / Blood Report</option>
                   <option value="prescription">Doctor Prescription (Rx)</option>
@@ -295,22 +296,22 @@ export const HealthRecordsView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-900 mb-1">Doctor / Lab Name</label>
+                <label className="block font-semibold text-slate-800 mb-1">Doctor / Lab Name</label>
                 <input
                   type="text"
                   value={newDoctorLab}
                   onChange={e => setNewDoctorLab(e.target.value)}
                   placeholder="e.g. Dr. Priya Venkatesh / National Reference Lab"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-3 py-1.5 rounded border border-slate-300 text-slate-900 focus:border-sky-600 focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-900 mb-1">Sharing Consent Default</label>
+                <label className="block font-semibold text-slate-800 mb-1">Sharing Consent Default</label>
                 <select
                   value={newConsentType}
                   onChange={e => setNewConsentType(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900 bg-white"
+                  className="w-full px-2.5 py-1.5 rounded border border-slate-300 text-slate-900 bg-white"
                 >
                   <option value="during_appointment">Share during active appointment only</option>
                   <option value="view_once">View once (single consultation review)</option>
@@ -320,13 +321,13 @@ export const HealthRecordsView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-900 mb-1">Tags (Comma-separated values)</label>
+                <label className="block font-semibold text-slate-800 mb-1">Tags (Comma-separated)</label>
                 <input
                   type="text"
                   value={newTags}
                   onChange={e => setNewTags(e.target.value)}
                   placeholder="e.g. TSH: 2.4, Normal Liver, Routine 2026"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-3 py-1.5 rounded border border-slate-300 text-slate-900 focus:border-sky-600 focus:outline-hidden"
                 />
               </div>
 
@@ -334,13 +335,13 @@ export const HealthRecordsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="px-4 py-2 rounded-xl text-slate-700 hover:bg-slate-100 font-semibold"
+                  className="px-3 py-1.5 rounded text-slate-700 hover:bg-slate-100 font-medium cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold"
+                  className="px-3.5 py-1.5 rounded bg-slate-900 hover:bg-slate-800 text-white font-medium cursor-pointer btn-press"
                 >
                   Save to Vault
                 </button>

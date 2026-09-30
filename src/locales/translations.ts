@@ -38,7 +38,7 @@ export const TRANSLATIONS: Record<IndianLanguage, LocaleStrings> = {
   en: {
     brandName: 'Sanjeevani',
     tagline: 'National Digital Medical Assistance Platform for India',
-    emergencyHelp: '🚨 EMERGENCY HELP',
+    emergencyHelp: 'Emergency Help',
     findDoctor: 'Find Doctors',
     findHospital: 'Hospitals & Beds',
     bookAppointment: 'Book OPD Slot',
@@ -50,7 +50,7 @@ export const TRANSLATIONS: Record<IndianLanguage, LocaleStrings> = {
     familyHealth: 'Family Health',
     govtSchemes: 'Government Schemes',
     medReminders: 'Medication Reminders',
-    healthGuideAI: 'HealthGuide AI',
+    healthGuideAI: 'Clinical & Health Guide',
     switchRole: 'Portal View',
     location: 'Location',
     searchPlaceholder: 'Search doctors, hospitals, medicines, PIN code...',
@@ -71,7 +71,7 @@ export const TRANSLATIONS: Record<IndianLanguage, LocaleStrings> = {
   hi: {
     brandName: 'संजीवनी',
     tagline: 'भारत का राष्ट्रीय डिजिटल चिकित्सा सहायता नेटवर्क',
-    emergencyHelp: '🚨 आपातकालीन सहायता',
+    emergencyHelp: 'आपातकालीन सहायता',
     findDoctor: 'डॉक्टर खोजें',
     findHospital: 'अस्पताल और बेड',
     bookAppointment: 'अपॉइंटमेंट बुक करें',

@@ -45,11 +45,15 @@ const AppContent: React.FC = () => {
     textSize, 
     notificationMessage,
     setIsEmergencyModalOpen,
+    selectedDoctorForBooking,
+    setSelectedDoctorForBooking,
     t
   } = useApp();
 
   const [bookingDoctor, setBookingDoctor] = useState<Doctor | null>(null);
   const [activeTelemedicineSession, setActiveTelemedicineSession] = useState<Appointment | null>(null);
+
+  const activeDoctorForBooking = bookingDoctor || selectedDoctorForBooking;
 
   // Dynamic font sizing classes
   const textSizeClass = textSize === 'xlarge' 
@@ -67,9 +71,9 @@ const AppContent: React.FC = () => {
       
       {/* Toast Notification */}
       {notificationMessage && (
-        <div className="fixed top-20 right-4 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-fade-in">
+        <div className="fixed top-16 right-4 z-50 bg-slate-900 text-white text-xs font-medium px-3.5 py-2.5 rounded-md shadow-lg border border-slate-700 flex items-center gap-2 max-w-sm">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{notificationMessage}</span>
+          <span className="leading-snug">{notificationMessage}</span>
         </div>
       )}
 
@@ -80,12 +84,16 @@ const AppContent: React.FC = () => {
       <EmergencyModal />
 
       {/* Booking Modal */}
-      {bookingDoctor && (
+      {activeDoctorForBooking && (
         <AppointmentBookingModal
-          doctor={bookingDoctor}
-          onClose={() => setBookingDoctor(null)}
+          doctor={activeDoctorForBooking}
+          onClose={() => {
+            setBookingDoctor(null);
+            setSelectedDoctorForBooking(null);
+          }}
           onSuccess={(apt) => {
             setBookingDoctor(null);
+            setSelectedDoctorForBooking(null);
             if (apt.type === 'telemedicine') {
               setActiveTelemedicineSession(apt);
             }
@@ -127,49 +135,49 @@ const AppContent: React.FC = () => {
       </main>
 
       {/* Mobile Fixed Bottom Navigation Bar (Natural Thumb Zone) */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200">
-        <div className="grid grid-cols-5 items-center h-16 px-2">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-xs">
+        <div className="grid grid-cols-5 items-center h-14 px-1">
           <button
             onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center justify-center h-full min-h-[44px] cursor-pointer ${activeTab === 'home' ? 'text-sky-700 font-bold' : 'text-slate-500'}`}
+            className={`flex flex-col items-center justify-center h-full min-h-[44px] cursor-pointer transition ${activeTab === 'home' ? 'text-sky-800 font-semibold' : 'text-slate-500 hover:text-slate-800'}`}
           >
-            <Home className="w-5 h-5" />
-            <span className="text-[10px] mt-1">Home</span>
+            <Home className="w-4 h-4" />
+            <span className="text-[10px] mt-0.5">Home</span>
           </button>
 
           <button
             onClick={() => setActiveTab('doctors')}
-            className={`flex flex-col items-center justify-center h-full min-h-[44px] cursor-pointer ${activeTab === 'doctors' ? 'text-sky-700 font-bold' : 'text-slate-500'}`}
+            className={`flex flex-col items-center justify-center h-full min-h-[44px] cursor-pointer transition ${activeTab === 'doctors' ? 'text-sky-800 font-semibold' : 'text-slate-500 hover:text-slate-800'}`}
           >
-            <Stethoscope className="w-5 h-5" />
-            <span className="text-[10px] mt-1">Doctors</span>
+            <Stethoscope className="w-4 h-4" />
+            <span className="text-[10px] mt-0.5">Doctors</span>
           </button>
 
           {/* Center SOS Button */}
           <button
             onClick={() => setIsEmergencyModalOpen(true)}
-            className="flex flex-col items-center justify-center h-full -mt-4 cursor-pointer"
+            className="flex flex-col items-center justify-center h-full cursor-pointer"
           >
-            <div className="w-12 h-12 rounded-full bg-rose-600 text-white shadow-lg flex items-center justify-center animate-pulse">
-              <ShieldAlert className="w-6 h-6" />
+            <div className="px-2.5 py-1 rounded bg-red-700 hover:bg-red-800 active:bg-red-900 text-white font-bold flex items-center gap-1 shadow-xs">
+              <ShieldAlert className="w-3.5 h-3.5" />
+              <span className="text-[11px] tracking-tight">108 SOS</span>
             </div>
-            <span className="text-[10px] font-bold text-rose-700 mt-1">108 SOS</span>
           </button>
 
           <button
             onClick={() => setActiveTab('telemedicine')}
-            className={`flex flex-col items-center justify-center h-full min-h-[44px] cursor-pointer ${activeTab === 'telemedicine' ? 'text-sky-700 font-bold' : 'text-slate-500'}`}
+            className={`flex flex-col items-center justify-center h-full min-h-[44px] cursor-pointer transition ${activeTab === 'telemedicine' ? 'text-sky-800 font-semibold' : 'text-slate-500 hover:text-slate-800'}`}
           >
-            <Video className="w-5 h-5" />
-            <span className="text-[10px] mt-1">Video OPD</span>
+            <Video className="w-4 h-4" />
+            <span className="text-[10px] mt-0.5">Video OPD</span>
           </button>
 
           <button
             onClick={() => setActiveTab('healthguide')}
-            className={`flex flex-col items-center justify-center h-full min-h-[44px] cursor-pointer ${activeTab === 'healthguide' ? 'text-sky-700 font-bold' : 'text-slate-500'}`}
+            className={`flex flex-col items-center justify-center h-full min-h-[44px] cursor-pointer transition ${activeTab === 'healthguide' ? 'text-sky-800 font-semibold' : 'text-slate-500 hover:text-slate-800'}`}
           >
-            <Bot className="w-5 h-5" />
-            <span className="text-[10px] mt-1">AI Guide</span>
+            <Bot className="w-4 h-4" />
+            <span className="text-[10px] mt-0.5">Care Guide</span>
           </button>
         </div>
       </nav>

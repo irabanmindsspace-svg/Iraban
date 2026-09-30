@@ -111,90 +111,90 @@ I can help you:
   ];
 
   return (
-    <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6">
+    <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 space-y-4">
       
       {/* Header Info Banner */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs mb-4">
+      <div className="bg-white rounded-lg p-5 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center text-sky-700">
-              <Bot className="w-6 h-6" />
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center text-sky-800 shrink-0 mt-0.5">
+              <Stethoscope className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-slate-900">HealthGuide AI Assistant</h1>
-                <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">
-                  Gemini Grounded Medical Triage
+                <h1 className="text-base font-bold text-slate-900">Clinical & Health Guide</h1>
+                <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-100 text-slate-700 rounded border border-slate-200">
+                  Triage & Consultation Prep
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                Safe clinical guidance, doctor preparation, and healthcare navigation across India.
+                Preliminary symptom triage, specialist recommendation, and preparation for doctor appointments.
               </p>
             </div>
           </div>
 
           <button
             onClick={() => setIsEmergencyModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition min-h-[44px]"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded transition cursor-pointer shrink-0 btn-press"
           >
-            <ShieldAlert className="w-4 h-4 text-rose-600" />
-            <span>Emergency Hotline 108</span>
+            <ShieldAlert className="w-4 h-4 text-red-700" />
+            <span>Emergency 108</span>
           </button>
         </div>
 
         {/* Clear Disclaimer */}
-        <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-start gap-2 text-xs text-slate-500">
-          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-          <p>
-            HealthGuide is an educational triage assistant, not an autonomous clinician. It does not replace medical consultation with a qualified doctor.
+        <div className="mt-3 pt-3 border-t border-slate-100 flex items-start gap-2 text-xs text-slate-500">
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+          <p className="text-[11px] leading-relaxed">
+            This guide is an informational triage aid, not an autonomous clinician. It does not replace clinical consultation with a qualified doctor.
           </p>
         </div>
       </div>
 
       {/* Chat Messages Container */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[520px] overflow-hidden">
+      <div className="bg-white rounded-lg border border-slate-200 flex flex-col h-[520px] overflow-hidden">
         
         {/* Messages Feed */}
-        <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
+        <div className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4">
           {messages.map(m => (
             <div
               key={m.id}
               className={`flex items-start gap-3 ${m.sender === 'user' ? 'flex-row-reverse' : ''}`}
             >
               {/* Avatar */}
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${m.sender === 'user' ? 'bg-slate-900 text-white' : 'bg-sky-600 text-white'}`}>
-                {m.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              <div className={`w-7 h-7 rounded flex items-center justify-center shrink-0 text-xs font-bold ${m.sender === 'user' ? 'bg-slate-900 text-white' : 'bg-sky-800 text-white'}`}>
+                {m.sender === 'user' ? <User className="w-3.5 h-3.5" /> : <Stethoscope className="w-3.5 h-3.5" />}
               </div>
 
               {/* Message Body */}
-              <div className={`max-w-[85%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed ${
+              <div className={`max-w-[85%] rounded p-3.5 text-xs sm:text-sm leading-relaxed ${
                 m.sender === 'user' 
-                  ? 'bg-slate-900 text-white rounded-tr-xs' 
+                  ? 'bg-slate-900 text-white' 
                   : m.isUrgent 
-                    ? 'bg-rose-50 border-2 border-rose-400 text-slate-900 rounded-tl-xs shadow-xs' 
-                    : 'bg-slate-50 border border-slate-200 text-slate-800 rounded-tl-xs'
+                    ? 'bg-red-50 border border-red-200 text-slate-900' 
+                    : 'bg-slate-50 border border-slate-200 text-slate-800'
               }`}>
                 {m.isUrgent && (
-                  <div className="flex items-center gap-2 mb-2 pb-2 border-b border-rose-200 text-rose-800 font-bold text-xs uppercase tracking-wide">
-                    <ShieldAlert className="w-4 h-4 text-rose-600 animate-pulse" />
-                    <span>Potential Urgent Condition Detected</span>
+                  <div className="flex items-center gap-1.5 mb-2 pb-2 border-b border-red-200 text-red-800 font-bold text-xs uppercase tracking-wide">
+                    <ShieldAlert className="w-3.5 h-3.5 text-red-700" />
+                    <span>Urgent Medical Warning</span>
                   </div>
                 )}
 
                 {/* Formatted Markdown-like Text Output */}
-                <div className="space-y-2 whitespace-pre-line">
+                <div className="space-y-1.5 whitespace-pre-line text-xs sm:text-sm">
                   {m.text}
                 </div>
 
                 {/* Quick Action If Specialty Recommended */}
                 {m.recommendedSpecialty && (
-                  <div className="mt-3 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                  <div className="mt-3 pt-2.5 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
                     <span className="text-xs font-semibold text-slate-700">
-                      Recommended: <strong className="text-sky-700">{m.recommendedSpecialty}</strong>
+                      Recommended: <strong className="text-sky-800">{m.recommendedSpecialty}</strong>
                     </span>
                     <button
                       onClick={() => setActiveTab('doctors')}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs rounded-lg transition"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded transition cursor-pointer btn-press"
                     >
                       <Stethoscope className="w-3.5 h-3.5" />
                       <span>Find {m.recommendedSpecialty}</span>
@@ -211,12 +211,12 @@ I can help you:
 
           {loading && (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center shrink-0">
-                <Bot className="w-4 h-4" />
+              <div className="w-7 h-7 rounded bg-sky-800 text-white flex items-center justify-center shrink-0">
+                <Stethoscope className="w-3.5 h-3.5" />
               </div>
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl rounded-tl-xs text-xs text-slate-500 flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-sky-600 animate-pulse" />
-                <span>HealthGuide is evaluating your question and preparing safe clinical guidance...</span>
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded text-xs text-slate-600 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-sky-700 animate-pulse" />
+                <span>Evaluating clinical guidance...</span>
               </div>
             </div>
           )}
@@ -225,13 +225,13 @@ I can help you:
         </div>
 
         {/* Quick Suggestion Prompts */}
-        <div className="px-4 py-2 bg-slate-50/70 border-t border-slate-100 flex items-center gap-2 overflow-x-auto scrollbar-none text-xs">
-          <span className="text-slate-400 text-[11px] font-medium whitespace-nowrap">Suggested:</span>
+        <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex items-center gap-2 overflow-x-auto text-xs">
+          <span className="text-slate-500 text-[11px] font-medium whitespace-nowrap">Suggested:</span>
           {PRESET_QUERIES.map((p, idx) => (
             <button
               key={idx}
               onClick={() => handleSendMessage(p.query)}
-              className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-medium whitespace-nowrap hover:bg-slate-100 transition cursor-pointer"
+              className="px-2.5 py-1 rounded bg-white border border-slate-200 hover:border-slate-300 text-slate-700 text-xs font-medium whitespace-nowrap hover:bg-slate-50 transition cursor-pointer btn-press"
             >
               {p.title}
             </button>
@@ -239,7 +239,7 @@ I can help you:
         </div>
 
         {/* Chat Input Field */}
-        <div className="p-3 sm:p-4 bg-white border-t border-slate-200">
+        <div className="p-3 bg-white border-t border-slate-200">
           <form
             onSubmit={e => {
               e.preventDefault();
@@ -251,16 +251,16 @@ I can help you:
               type="text"
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder="Ask HealthGuide about symptoms, test terms, or doctor preparation..."
-              className="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 min-h-[44px]"
+              placeholder="Ask about symptoms, medical reports, or preparation for doctor visit..."
+              className="flex-1 px-3.5 py-2 rounded border border-slate-300 focus:border-sky-600 focus:outline-hidden text-xs text-slate-900 placeholder:text-slate-400"
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white rounded-xl font-bold text-xs sm:text-sm flex items-center gap-1.5 transition cursor-pointer min-h-[44px]"
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white rounded font-medium text-xs flex items-center gap-1.5 transition cursor-pointer btn-press"
             >
-              <Send className="w-4 h-4" />
-              <span className="hidden sm:inline">Send</span>
+              <Send className="w-3.5 h-3.5" />
+              <span>Send</span>
             </button>
           </form>
         </div>
