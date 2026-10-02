@@ -14,11 +14,12 @@ import {
   ShieldCheck, 
   Send, 
   Trash2,
-  FileCheck
+  FileCheck,
+  QrCode
 } from 'lucide-react';
 
 export const DoctorDashboard: React.FC = () => {
-  const { user, showNotification, setActiveTeleconsultationAppointment, setActiveTab } = useApp();
+  const { user, showNotification, setActiveTeleconsultationAppointment, setActiveTab, openLoginForRole, openQrScanner } = useApp();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeAppointment, setActiveAppointment] = useState<Appointment | null>(null);
@@ -124,26 +125,41 @@ export const DoctorDashboard: React.FC = () => {
       <div className="bg-white rounded-lg p-5 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded bg-slate-100 text-sky-800 flex items-center justify-center">
+            <div className="w-10 h-10 rounded bg-slate-100 text-sky-800 flex items-center justify-center shrink-0">
               <Stethoscope className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-slate-900">Dr. Priya Venkatesh, MD</h1>
+                <h1 className="text-lg font-bold text-slate-900">
+                  {user?.role === 'doctor' ? user.fullName : 'Dr. Priya Venkatesh, MD'}
+                </h1>
                 <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded border border-emerald-200 flex items-center gap-1">
                   <CheckCircle className="w-3 h-3 text-emerald-700" />
                   NMC Verified
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                Reg: MCI-2012-44192 (Delhi Medical Council) · Internal Medicine · AIIMS Affiliated
+                Reg: {user?.doctorRegistrationNumber || 'MCI-2012-44192'} ({user?.medicalCouncil || 'Delhi Medical Council'}) · {user?.specialization || 'Internal Medicine'} · {user?.hospitalAffiliation || 'AIIMS Affiliated'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
-            <span className="font-semibold text-slate-800">OPD Timings:</span>
-            <span>09:00 AM - 01:00 PM, 05:00 PM - 08:00 PM</span>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => openQrScanner('patient_records')}
+              className="px-3.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white rounded text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-xs btn-press"
+              title="Scan patient's ABHA card or appointment pass with camera"
+            >
+              <QrCode className="w-3.5 h-3.5 text-sky-200" />
+              <span>Scan Patient ABHA QR</span>
+            </button>
+
+            <button
+              onClick={() => openLoginForRole('doctor')}
+              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-medium transition cursor-pointer btn-press"
+            >
+              {user?.role === 'doctor' ? 'Switch Doctor' : 'Doctor Sign In'}
+            </button>
           </div>
         </div>
       </div>

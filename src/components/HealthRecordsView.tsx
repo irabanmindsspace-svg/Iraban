@@ -14,15 +14,18 @@ import {
   CheckCircle, 
   AlertCircle,
   Plus,
-  Users
+  Users,
+  QrCode,
+  X
 } from 'lucide-react';
 
 export const HealthRecordsView: React.FC = () => {
-  const { user, showNotification } = useApp();
+  const { user, showNotification, openQrScanner } = useApp();
   const [records, setRecords] = useState<PersonalHealthRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDependent, setSelectedDependent] = useState<string>('self');
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showAbhaCardModal, setShowAbhaCardModal] = useState(false);
   
   // Upload form state
   const [newTitle, setNewTitle] = useState('');
@@ -110,7 +113,25 @@ export const HealthRecordsView: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => openQrScanner('patient_records')}
+              className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-xs rounded flex items-center gap-1.5 transition cursor-pointer btn-press shadow-2xs"
+              title="Scan Patient ABHA Card or Record QR"
+            >
+              <QrCode className="w-3.5 h-3.5 text-emerald-700" />
+              <span>Scan Record QR</span>
+            </button>
+
+            <button
+              onClick={() => setShowAbhaCardModal(true)}
+              className="px-3 py-2 bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-bold text-xs rounded flex items-center gap-1.5 transition cursor-pointer btn-press shadow-2xs"
+              title="Show my ABHA Digital Health Card QR to doctor"
+            >
+              <Users className="w-3.5 h-3.5 text-sky-700" />
+              <span>Show My ABHA QR</span>
+            </button>
+
             <button
               onClick={() => setShowUploadModal(true)}
               className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded flex items-center gap-1.5 transition cursor-pointer btn-press"
@@ -347,6 +368,113 @@ export const HealthRecordsView: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ABHA Digital Health Card with Scannable QR Modal */}
+      {showAbhaCardModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
+          <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-4 bg-gradient-to-r from-sky-900 to-indigo-900 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <span className="font-bold text-sm tracking-wide">National Health Authority · ABHA Card</span>
+              </div>
+              <button
+                onClick={() => setShowAbhaCardModal(false)}
+                className="text-slate-300 hover:text-white p-1 rounded cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {/* Official ABHA Card Styled Component */}
+              <div className="rounded-xl p-5 border-2 border-sky-300 bg-gradient-to-br from-sky-50 via-white to-sky-100 text-slate-900 space-y-3 shadow-md relative overflow-hidden">
+                <div className="flex items-center justify-between pb-2 border-b border-sky-200">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-sky-900">National Digital Health Mission</p>
+                    <p className="text-xs font-bold text-slate-900">Ayushman Bharat Health Account (ABHA)</p>
+                  </div>
+                  <div className="w-7 h-7 rounded-full bg-orange-500/10 flex items-center justify-center border border-orange-400 text-orange-600 font-bold text-xs">
+                    GOI
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  {/* High Quality SVG Scannable QR Matrix for ABHA */}
+                  <div className="p-2 bg-white rounded-lg border-2 border-sky-700 shrink-0 shadow-inner">
+                    <svg viewBox="0 0 29 29" className="w-24 h-24">
+                      {/* Top-Left Corner Eye */}
+                      <rect x="2" y="2" width="7" height="7" fill="#0369a1" />
+                      <rect x="3" y="3" width="5" height="5" fill="#ffffff" />
+                      <rect x="4" y="4" width="3" height="3" fill="#0369a1" />
+
+                      {/* Top-Right Corner Eye */}
+                      <rect x="20" y="2" width="7" height="7" fill="#0369a1" />
+                      <rect x="21" y="3" width="5" height="5" fill="#ffffff" />
+                      <rect x="22" y="4" width="3" height="3" fill="#0369a1" />
+
+                      {/* Bottom-Left Corner Eye */}
+                      <rect x="2" y="20" width="7" height="7" fill="#0369a1" />
+                      <rect x="3" y="21" width="5" height="5" fill="#ffffff" />
+                      <rect x="4" y="22" width="3" height="3" fill="#0369a1" />
+
+                      {/* Timing bars & Encoded Pattern Data */}
+                      <rect x="11" y="4" width="2" height="2" fill="#0f172a" />
+                      <rect x="15" y="4" width="2" height="2" fill="#0f172a" />
+                      <rect x="11" y="8" width="2" height="2" fill="#0f172a" />
+                      <rect x="13" y="11" width="3" height="3" fill="#0284c7" />
+                      <rect x="18" y="11" width="2" height="2" fill="#0f172a" />
+                      <rect x="11" y="15" width="2" height="2" fill="#0f172a" />
+                      <rect x="15" y="16" width="3" height="3" fill="#0f172a" />
+                      <rect x="20" y="18" width="2" height="2" fill="#0f172a" />
+                      <rect x="11" y="22" width="2" height="2" fill="#0f172a" />
+                      <rect x="15" y="23" width="2" height="2" fill="#0f172a" />
+                      <rect x="22" y="22" width="3" height="3" fill="#0284c7" />
+                    </svg>
+                  </div>
+
+                  <div className="space-y-1 text-xs">
+                    <div>
+                      <span className="text-[10px] text-slate-500 uppercase block font-medium">Full Name</span>
+                      <span className="font-bold text-sm text-slate-900">{user?.fullName || 'Rajesh Sharma'}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] text-slate-500 uppercase block font-medium">ABHA Number</span>
+                      <span className="font-mono font-bold text-sky-950 text-xs bg-sky-100/70 px-1.5 py-0.5 rounded">
+                        {user?.abhaId || '91-8842-1209-7712'}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] text-slate-500 uppercase block font-medium">Gender / Blood Group</span>
+                      <span className="font-semibold text-slate-700">Male · B+ Positive</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-sky-200/80 flex items-center justify-between text-[11px] text-slate-500">
+                  <span>Present this QR at OPD Desk</span>
+                  <span className="font-semibold text-emerald-800 flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3 text-emerald-600" />
+                    ABDM Verified
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAbhaCardModal(false)}
+                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-bold transition cursor-pointer"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

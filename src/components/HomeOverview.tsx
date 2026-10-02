@@ -38,6 +38,7 @@ import {
   Droplet,
   HeartPulse,
   Share2,
+  Camera,
   Download,
   X,
   Plus,
@@ -119,7 +120,9 @@ export const HomeOverview: React.FC = () => {
     setIsEmergencyModalOpen, 
     setSelectedDoctorForBooking,
     updateLocation,
-    showNotification 
+    showNotification,
+    openLoginForRole,
+    openQrScanner
   } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -236,6 +239,22 @@ export const HomeOverview: React.FC = () => {
     const query = (customQuery !== undefined ? customQuery : searchQuery).trim().toLowerCase();
     if (!query) return;
 
+    if (query.includes('scan') || query.includes('qr') || query.includes('barcode') || query.includes('camera')) {
+      openQrScanner('all');
+      showNotification('Opening Live Camera QR Scanner for Records & Prescriptions...');
+      return;
+    }
+
+    if (query.includes('calc') || query.includes('bill') || query.includes('saving') || query.includes('generic cost')) {
+      setActiveTool('calculator');
+      setTimeout(() => {
+        const el = document.getElementById('visual-tools-section');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+      showNotification('Opened Generic Medicine Bill & Prescription Savings Calculator below.');
+      return;
+    }
+
     if (query.includes('hosp') || query.includes('bed') || query.includes('icu') || query.includes('aiims') || query.includes('trauma')) {
       setActiveTab('hospitals');
     } else if (query.includes('med') || query.includes('pharm') || query.includes('dolo') || query.includes('metformin') || query.includes('jan aushadhi')) {
@@ -251,6 +270,15 @@ export const HomeOverview: React.FC = () => {
     } else {
       setActiveTab('doctors');
     }
+  };
+
+  const handleOpenCalculator = () => {
+    setActiveTool('calculator');
+    setTimeout(() => {
+      const el = document.getElementById('visual-tools-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+    showNotification('Opened Generic Medicine Bill & Prescription Savings Calculator below.');
   };
 
   // Toggle Medication Dose
@@ -288,8 +316,9 @@ export const HomeOverview: React.FC = () => {
 
   // Real-time suggested search matches
   const sampleSuggestions = [
+    { label: 'Medicine Bill & Savings Calculator', type: 'Tool', tab: 'pharmacy' as const, isCalculator: true },
     { label: 'Dr. Priya Venkatesh (Cardiology)', type: 'Doctor', tab: 'doctors' as const },
-    { label: 'Metformin SR 500mg (Jan Aushadhi ₹12)', type: 'Medicine', tab: 'pharmacy' as const },
+    { label: 'Metformin SR 500mg (Jan Aushadhi ₹11)', type: 'Medicine', tab: 'pharmacy' as const },
     { label: 'AIIMS Apex Emergency Trauma Center', type: 'Hospital', tab: 'hospitals' as const },
     { label: 'HbA1c & Fasting Glucose Profile', type: 'Lab Test', tab: 'labs' as const },
   ].filter(item => !searchQuery || item.label.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -355,6 +384,39 @@ export const HomeOverview: React.FC = () => {
                 ABDM Verified · {user?.abhaId || '91-8842-1209-7712'}
                 <QrCode className="w-3 h-3 text-emerald-800 ml-0.5" />
               </button>
+
+              {/* Live Camera QR Scanner Trigger */}
+              <button
+                onClick={() => openQrScanner('all')}
+                className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-800 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-900 hover:border-emerald-300 px-2.5 py-1 rounded border border-slate-300 transition cursor-pointer btn-press shadow-2xs"
+                title="Scan Patient ABHA Card or Doctor Prescription QR code using camera"
+              >
+                <Camera className="w-3 h-3 text-emerald-700" />
+                <span>Scan QR</span>
+              </button>
+
+              {/* Quick Role Portal Login Pill Links */}
+              <div className="hidden sm:flex items-center gap-1.5 text-[11px]">
+                <span className="text-slate-400">Portal Login:</span>
+                <button
+                  onClick={() => openLoginForRole('doctor')}
+                  className="px-2 py-0.5 rounded font-semibold text-sky-800 bg-sky-50 hover:bg-sky-100 border border-sky-200 transition cursor-pointer"
+                >
+                  Doctor 🩺
+                </button>
+                <button
+                  onClick={() => openLoginForRole('pharmacy')}
+                  className="px-2 py-0.5 rounded font-semibold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition cursor-pointer"
+                >
+                  Pharmacy 💊
+                </button>
+                <button
+                  onClick={() => openLoginForRole('admin')}
+                  className="px-2 py-0.5 rounded font-semibold text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition cursor-pointer"
+                >
+                  Admin 🛡️
+                </button>
+              </div>
             </div>
             <p className="text-xs text-slate-500 mt-1">
               Find verified doctors, track emergency bed availability, and compare generic medicines with zero markup.
@@ -436,7 +498,11 @@ export const HomeOverview: React.FC = () => {
                     onClick={() => {
                       setIsSearchFocused(false);
                       setSearchQuery(sug.label);
-                      setActiveTab(sug.tab);
+                      if (sug.isCalculator) {
+                        handleOpenCalculator();
+                      } else {
+                        setActiveTab(sug.tab);
+                      }
                     }}
                     className="p-2.5 hover:bg-sky-50 flex items-center justify-between cursor-pointer transition text-xs"
                   >
@@ -457,6 +523,7 @@ export const HomeOverview: React.FC = () => {
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs">
             <span className="text-[11px] font-medium text-slate-400">Popular:</span>
             {[
+              { label: 'Medicine Bill Calculator', q: 'calc' },
               { label: 'General Physician', q: 'general' },
               { label: 'Cardiology OPD', q: 'cardiology' },
               { label: 'Metformin 500mg (Jan Aushadhi)', q: 'metformin' },
@@ -693,7 +760,7 @@ export const HomeOverview: React.FC = () => {
 
               <div className="flex items-center gap-2 shrink-0">
                 <button
-                  onClick={() => setActiveTool('calculator')}
+                  onClick={handleOpenCalculator}
                   className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded font-medium text-xs transition cursor-pointer btn-press"
                 >
                   Open Medicine Cost Calculator
@@ -1079,7 +1146,7 @@ export const HomeOverview: React.FC = () => {
           </div>
 
           {/* Interactive Tools Container with clean tabs */}
-          <div className="space-y-3">
+          <div className="space-y-3" id="visual-tools-section">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2 bg-white px-3 py-2 rounded-t-lg">
               <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 Healthcare Visual Tools

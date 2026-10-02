@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const AdminVerificationDashboard: React.FC = () => {
-  const { showNotification } = useApp();
+  const { user, showNotification, openLoginForRole } = useApp();
   const [overview, setOverview] = useState<any>(null);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,20 +62,29 @@ export const AdminVerificationDashboard: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-bold tracking-tight text-slate-900">
-                Medical Platform Administration & Verification
+                {user?.role === 'admin' ? user.fullName : 'Medical Platform Administration & Verification'}
               </h1>
               <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-900 text-white rounded">
-                Admin Console
+                NHA Admin Console
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              National Medical Commission (NMC) credential verification, audit logs, and provider oversight.
+              {user?.department || 'National Medical Commission (NMC) credential verification, audit logs, and provider oversight.'} {user?.adminClearanceLevel ? `· ${user.adminClearanceLevel}` : ''}
             </p>
           </div>
 
-          <div className="text-xs text-slate-600 flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
-            <ShieldCheck className="w-4 h-4 text-emerald-700" />
-            <span>Anti-Fraud & Practitioner Registry Protection</span>
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-slate-600 flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
+              <ShieldCheck className="w-4 h-4 text-emerald-700" />
+              <span>Anti-Fraud Registry</span>
+            </div>
+
+            <button
+              onClick={() => openLoginForRole('admin')}
+              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-medium transition cursor-pointer btn-press"
+            >
+              {user?.role === 'admin' ? 'Switch Admin' : 'Admin Sign In'}
+            </button>
           </div>
         </div>
 

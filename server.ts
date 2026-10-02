@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { 
   INITIAL_USER, 
+  DEFAULT_ROLE_USERS,
   INITIAL_DOCTORS, 
   INITIAL_HOSPITALS, 
   INITIAL_MEDICINES, 
@@ -16,7 +17,10 @@ import {
   INITIAL_EMERGENCY_GUIDES,
   INITIAL_APPOINTMENTS,
   INITIAL_HEALTH_RECORDS,
-  INITIAL_REMINDERS
+  INITIAL_REMINDERS,
+  INITIAL_PRESCRIPTIONS,
+  INITIAL_INSURANCE_POLICIES,
+  INITIAL_INSURANCE_CLAIMS
 } from './src/data/seedData';
 import { 
   Appointment, 
@@ -26,7 +30,9 @@ import {
   DigitalPrescription,
   MedicationReminder,
   UserProfile,
-  UserRole
+  UserRole,
+  InsurancePolicy,
+  InsuranceClaim
 } from './src/types';
 
 dotenv.config();
@@ -41,7 +47,9 @@ let hospitals: Hospital[] = [...INITIAL_HOSPITALS];
 let appointments: Appointment[] = [...INITIAL_APPOINTMENTS];
 let healthRecords: PersonalHealthRecord[] = [...INITIAL_HEALTH_RECORDS];
 let reminders: MedicationReminder[] = [...INITIAL_REMINDERS];
-let digitalPrescriptions: DigitalPrescription[] = [];
+let digitalPrescriptions: DigitalPrescription[] = [...INITIAL_PRESCRIPTIONS];
+let insurancePolicies: InsurancePolicy[] = [...INITIAL_INSURANCE_POLICIES];
+let insuranceClaims: InsuranceClaim[] = [...INITIAL_INSURANCE_CLAIMS];
 let emergencyDispatches: any[] = [];
 let auditLogs: any[] = [
   {
@@ -105,6 +113,156 @@ async function startServer() {
   // Auth & Profile
   app.get('/api/auth/me', (req: Request, res: Response) => {
     res.json({ success: true, user: currentUser });
+  });
+
+  app.post('/api/auth/login', (req: Request, res: Response) => {
+    const { role, identifier, password, extraCredentials } = req.body as {
+      role: UserRole;
+      identifier?: string;
+      password?: string;
+      extraCredentials?: Record<string, string>;
+    };
+
+    if (!role || !['patient', 'doctor', 'hospital', 'pharmacy', 'laboratory', 'admin'].includes(role)) {
+      res.status(400).json({ success: false, message: 'Invalid or missing user role for login' });
+      return;
+    }
+
+    // Load default profile for the role
+    const defaultProfile = DEFAULT_ROLE_USERS[role] || { ...INITIAL_USER, role };
+    
+    // Create authentic profile merged with provided credentials
+    const authenticatedUser: UserProfile = {
+      ...defaultProfile,
+      role,
+    };
+
+    if (identifier) {
+      if (role === 'doctor') {
+        if (identifier.startsWith('MCI') || identifier.startsWith('DMC') || identifier.includes('-')) {
+          authenticatedUser.doctorRegistrationNumber = identifier;
+        } else if (identifier.includes('@')) {
+          authenticatedUser.email = identifier;
+        } else {
+          authenticatedUser.phone = identifier;
+        }
+        if (extraCredentials?.doctorName) {
+          authenticatedUser.fullName = extraCredentials.doctorName;
+        }
+        if (extraCredentials?.hospitalAffiliation) {
+          authenticatedUser.hospitalAffiliation = extraCredentials.hospitalAffiliation;
+        }
+        if (extraCredentials?.specialization) {
+          authenticatedUser.specialization = extraCredentials.specialization;
+        }
+      } else if (role === 'patient') {
+        if (identifier.includes('-')) {
+          authenticatedUser.abhaId = identifier;
+        } else if (identifier.includes('@')) {
+          authenticatedUser.email = identifier;
+        } else {
+          authenticatedUser.phone = identifier;
+        }
+        if (extraCredentials?.fullName) {
+          authenticatedUser.fullName = extraCredentials.fullName;
+        }
+      } else if (role === 'pharmacy') {
+        if (identifier.startsWith('DL') || identifier.startsWith('PMBJP')) {
+          authenticatedUser.pharmacyLicenseNumber = identifier;
+        } else if (identifier.includes('@')) {
+          authenticatedUser.email = identifier;
+        }
+        if (extraCredentials?.pharmacyName) {
+          authenticatedUser.pharmacyName = extraCredentials.pharmacyName;
+        }
+      } else if (role === 'admin') {
+        if (identifier.includes('@')) {
+          authenticatedUser.email = identifier;
+        }
+        if (extraCredentials?.department) {
+          authenticatedUser.department = extraCredentials.department;
+        }
+      }
+    }
+
+    currentUser = authenticatedUser;
+
+    // Record audit log
+    auditLogs.unshift({
+      id: `aud_${Date.now()}`,
+      actor: `${currentUser.fullName} (${currentUser.role.toUpperCase()})`,
+      action: 'PORTAL_LOGIN',
+      details: `Logged into ${role.toUpperCase()} portal with identifier: ${identifier || 'Demo Account'}`,
+      timestamp: new Date().toISOString(),
+      status: 'AUTHENTICATED'
+    });
+
+    res.json({
+      success: true,
+      message: `Successfully authenticated as ${currentUser.fullName}`,
+      user: currentUser,
+      token: `sanjeevani_token_${Date.now()}`
+    });
+  });
+
+  // Biometric Authentication for Patients and Doctors (Touch ID / Face ID / WebAuthn)
+  app.post('/api/auth/biometric-login', (req: Request, res: Response) => {
+    const { role, biometricType, credentialId } = req.body as { 
+      role: UserRole; 
+      biometricType?: string; 
+      credentialId?: string;
+    };
+
+    if (!role || !['patient', 'doctor'].includes(role)) {
+      res.status(400).json({ success: false, message: 'Biometric authentication is supported for Patients and Doctors.' });
+      return;
+    }
+
+    const defaultProfile = DEFAULT_ROLE_USERS[role] || { ...INITIAL_USER, role };
+    currentUser = {
+      ...defaultProfile,
+      role
+    };
+
+    auditLogs.unshift({
+      id: `aud_${Date.now()}`,
+      actor: `${currentUser.fullName} (${currentUser.role.toUpperCase()})`,
+      action: 'BIOMETRIC_LOGIN',
+      details: `Biometrically verified via ${biometricType || 'Fingerprint / Face ID'} (WebAuthn Passkey: ${credentialId || 'HW-SEC-ENCLAVE-FIDO2'})`,
+      timestamp: new Date().toISOString(),
+      status: 'VERIFIED_BIOMETRIC'
+    });
+
+    res.json({
+      success: true,
+      message: `Biometric identity confirmed for ${currentUser.fullName}. Welcome!`,
+      user: currentUser,
+      authMethod: 'biometric',
+      token: `sanjeevani_bio_token_${Date.now()}`
+    });
+  });
+
+  app.post('/api/auth/logout', (req: Request, res: Response) => {
+    const previousUser = currentUser.fullName;
+    const previousRole = currentUser.role;
+
+    // Reset to default patient guest
+    currentUser = { ...INITIAL_USER };
+
+    auditLogs.unshift({
+      id: `aud_${Date.now()}`,
+      actor: `${previousUser} (${previousRole.toUpperCase()})`,
+      action: 'PORTAL_LOGOUT',
+      details: `Logged out from ${previousRole.toUpperCase()} portal`,
+      timestamp: new Date().toISOString(),
+      status: 'SESSION_TERMINATED'
+    });
+
+    res.json({
+      success: true,
+      message: 'Logged out successfully',
+      user: currentUser
+    });
   });
 
   app.post('/api/auth/switch-role', (req: Request, res: Response) => {
@@ -384,6 +542,236 @@ async function startServer() {
 
   app.get('/api/prescriptions', (req: Request, res: Response) => {
     res.json({ success: true, prescriptions: digitalPrescriptions });
+  });
+
+  app.get('/api/prescriptions/:id', (req: Request, res: Response) => {
+    const rx = digitalPrescriptions.find(p => p.id === req.params.id || p.qrVerificationCode === req.params.id);
+    if (!rx) {
+      res.status(404).json({ success: false, message: 'Prescription not found' });
+      return;
+    }
+    res.json({ success: true, prescription: rx });
+  });
+
+  app.post('/api/prescriptions/:id/dispense', (req: Request, res: Response) => {
+    const prescription = digitalPrescriptions.find(p => p.id === req.params.id || p.qrVerificationCode === req.params.id);
+    if (!prescription) {
+      res.status(404).json({ success: false, message: 'Prescription not found' });
+      return;
+    }
+
+    const { pharmacyName, pharmacyLicense } = req.body;
+    prescription.dispensedStatus = 'dispensed';
+    prescription.dispensedAt = new Date().toISOString();
+    prescription.dispensedByPharmacy = pharmacyName || currentUser.pharmacyName || 'Jan Aushadhi Kendra';
+    prescription.dispensedPharmacyLicense = pharmacyLicense || currentUser.pharmacyLicenseNumber || 'DL-DLH-2021-99881';
+
+    auditLogs.unshift({
+      id: `aud_${Date.now()}`,
+      actor: `${currentUser.fullName} (${currentUser.role.toUpperCase()})`,
+      action: 'PRESCRIPTION_DISPENSED',
+      details: `Prescription ${prescription.id} dispensed via PMBJP pharmacy: ${prescription.dispensedByPharmacy}`,
+      timestamp: new Date().toISOString(),
+      status: 'DISPENSED'
+    });
+
+    res.json({ success: true, prescription });
+  });
+
+  // QR Code Verification Endpoint for Medical Records & Prescriptions
+  app.post('/api/qr/verify', (req: Request, res: Response) => {
+    const { qrData } = req.body as { qrData: string };
+    if (!qrData || typeof qrData !== 'string') {
+      res.status(400).json({ success: false, message: 'Missing QR code data' });
+      return;
+    }
+
+    const trimmed = qrData.trim();
+
+    // 1. Try parsing JSON if encoded as structured object
+    let parsedJson: any = null;
+    try {
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        parsedJson = JSON.parse(trimmed);
+      }
+    } catch (e) {
+      // not JSON
+    }
+
+    // 2. Check if prescription (SNJ-RX-301, rx_301, or json)
+    const rxMatch = digitalPrescriptions.find(p => 
+      p.id.toLowerCase() === trimmed.toLowerCase() ||
+      p.qrVerificationCode?.toLowerCase() === trimmed.toLowerCase() ||
+      (parsedJson?.id && p.id === parsedJson.id) ||
+      (parsedJson?.qrVerificationCode && p.qrVerificationCode === parsedJson.qrVerificationCode) ||
+      trimmed.includes(p.id) ||
+      (p.qrVerificationCode && trimmed.includes(p.qrVerificationCode))
+    );
+
+    if (rxMatch) {
+      auditLogs.unshift({
+        id: `aud_${Date.now()}`,
+        actor: `${currentUser.fullName} (${currentUser.role.toUpperCase()})`,
+        action: 'QR_PRESCRIPTION_VERIFIED',
+        details: `Verified prescription ${rxMatch.id} (${rxMatch.diagnosis}) via QR scanner`,
+        timestamp: new Date().toISOString(),
+        status: 'VERIFIED'
+      });
+
+      res.json({
+        success: true,
+        type: 'prescription',
+        prescription: rxMatch,
+        verification: {
+          isValid: true,
+          authority: 'National Medical Commission (NMC) & ABDM Digital Health Ecosystem',
+          digitalSignature: rxMatch.digitalSignature,
+          verifiedAt: new Date().toISOString(),
+          verifier: currentUser.fullName,
+          doctorRegistration: rxMatch.registrationNumber,
+          dispensedStatus: rxMatch.dispensedStatus || 'pending'
+        }
+      });
+      return;
+    }
+
+    // 3. Check if patient ABHA ID or patient ID or medical record
+    const isAbhaPattern = /^(ABHA[-:]?)?[0-9]{2}[- ]?[0-9]{4}[- ]?[0-9]{4}[- ]?[0-9]{4}$/i.test(trimmed) ||
+      trimmed.toLowerCase().includes('abha') ||
+      trimmed.startsWith('usr_pat');
+
+    let targetPatient = currentUser;
+    if (currentUser.abhaId && (trimmed.includes(currentUser.abhaId) || trimmed.replace(/[- ]/g, '').includes(currentUser.abhaId.replace(/[- ]/g, '')))) {
+      targetPatient = currentUser;
+    } else if (trimmed.includes('usr_pat_9901') || trimmed.includes('91-8842-1209-7712') || trimmed.includes('91-8823-1049-5512')) {
+      targetPatient = DEFAULT_ROLE_USERS.patient || currentUser;
+    }
+
+    // Check single health record match
+    const singleRecMatch = healthRecords.find(r => 
+      r.id.toLowerCase() === trimmed.toLowerCase() ||
+      r.qrVerificationCode?.toLowerCase() === trimmed.toLowerCase() ||
+      trimmed.includes(r.id) ||
+      (r.qrVerificationCode && trimmed.includes(r.qrVerificationCode))
+    );
+
+    if (singleRecMatch || isAbhaPattern) {
+      const patientRecords = healthRecords.filter(r => r.patientId === targetPatient.id || r.id === singleRecMatch?.id);
+      
+      auditLogs.unshift({
+        id: `aud_${Date.now()}`,
+        actor: `${currentUser.fullName} (${currentUser.role.toUpperCase()})`,
+        action: 'QR_PATIENT_RECORDS_ACCESSED',
+        details: `Quick-accessed medical vault for patient ${targetPatient.fullName} (ABHA: ${targetPatient.abhaId}) via QR scanner`,
+        timestamp: new Date().toISOString(),
+        status: 'CONSENT_GRANTED'
+      });
+
+      res.json({
+        success: true,
+        type: 'patient_record',
+        patient: {
+          id: targetPatient.id,
+          fullName: targetPatient.fullName,
+          phone: targetPatient.phone,
+          abhaId: targetPatient.abhaId || '91-8842-1209-7712',
+          dependents: targetPatient.dependents,
+          location: targetPatient.location,
+          bloodGroup: 'B+',
+          allergies: ['Penicillin', 'Sulfa drugs'],
+          chronicConditions: ['Type 2 Diabetes Mellitus', 'Stage 1 Essential Hypertension'],
+          emergencyContact: '+91 98765 43210 (Wife - Sunita Sharma)'
+        },
+        records: patientRecords.length > 0 ? patientRecords : healthRecords,
+        singleRecord: singleRecMatch || null,
+        verification: {
+          isValid: true,
+          authority: 'Ayushman Bharat Digital Mission (ABDM) PHR Registry',
+          verifiedAt: new Date().toISOString(),
+          verifier: currentUser.fullName,
+          consentGranted: true,
+          consentType: 'during_consultation'
+        }
+      });
+      return;
+    }
+
+    // 4. Check if Appointment QR
+    const aptMatch = appointments.find(a => 
+      a.id.toLowerCase() === trimmed.toLowerCase() ||
+      a.qrVerificationCode?.toLowerCase() === trimmed.toLowerCase() ||
+      trimmed.includes(a.id) ||
+      (a.qrVerificationCode && trimmed.includes(a.qrVerificationCode))
+    );
+
+    if (aptMatch) {
+      auditLogs.unshift({
+        id: `aud_${Date.now()}`,
+        actor: `${currentUser.fullName} (${currentUser.role.toUpperCase()})`,
+        action: 'QR_APPOINTMENT_VERIFIED',
+        details: `Verified OPD appointment ${aptMatch.id} for ${aptMatch.patientName} via QR scanner`,
+        timestamp: new Date().toISOString(),
+        status: 'VERIFIED'
+      });
+
+      res.json({
+        success: true,
+        type: 'appointment',
+        appointment: aptMatch,
+        verification: {
+          isValid: true,
+          authority: 'Apex OPD Queue Management & ABDM Check-In',
+          verifiedAt: new Date().toISOString(),
+          verifier: currentUser.fullName,
+        }
+      });
+      return;
+    }
+
+    // 5. Check if Insurance Policy / Ayushman Bharat Golden Card QR
+    const insMatch = insurancePolicies.find(p => 
+      p.id.toLowerCase() === trimmed.toLowerCase() ||
+      p.policyNumber.toLowerCase() === trimmed.toLowerCase() ||
+      p.qrVerificationCode?.toLowerCase() === trimmed.toLowerCase() ||
+      trimmed.includes(p.policyNumber) ||
+      (p.qrVerificationCode && trimmed.includes(p.qrVerificationCode))
+    );
+
+    if (insMatch) {
+      auditLogs.unshift({
+        id: `aud_${Date.now()}`,
+        actor: `${currentUser.fullName} (${currentUser.role.toUpperCase()})`,
+        action: 'QR_INSURANCE_VERIFIED',
+        details: `Verified insurance policy ${insMatch.policyNumber} (${insMatch.providerName}) via QR scanner`,
+        timestamp: new Date().toISOString(),
+        status: 'VERIFIED'
+      });
+
+      res.json({
+        success: true,
+        type: 'insurance_policy',
+        policy: insMatch,
+        verification: {
+          isValid: true,
+          authority: insMatch.providerType === 'ayushman_bharat' ? 'National Health Authority (NHA) & AB-PMJAY' : 'IRDAI & Empanelled TPA Network',
+          verifiedAt: new Date().toISOString(),
+          verifier: currentUser.fullName,
+          activeStatus: insMatch.status,
+          sumInsured: insMatch.sumInsured,
+          remainingAmount: insMatch.remainingAmount
+        }
+      });
+      return;
+    }
+
+    // Fallback: Custom / Unrecognized barcode
+    res.json({
+      success: true,
+      type: 'custom_qr',
+      rawData: trimmed,
+      message: 'QR code read successfully.',
+      parsed: parsedJson
+    });
   });
 
   // Personal Health Records (PHR) API

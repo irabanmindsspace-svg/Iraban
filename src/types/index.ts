@@ -46,6 +46,14 @@ export interface UserProfile {
   };
   abhaId?: string; // Ayushman Bharat Health Account ID (ABHA)
   dependents: FamilyMember[];
+  doctorRegistrationNumber?: string;
+  specialization?: string;
+  hospitalAffiliation?: string;
+  medicalCouncil?: string;
+  pharmacyLicenseNumber?: string;
+  pharmacyName?: string;
+  adminClearanceLevel?: string;
+  department?: string;
 }
 
 export interface Doctor {
@@ -221,6 +229,11 @@ export interface DigitalPrescription {
   lifestyleAdvice: string;
   followUpDate?: string;
   digitalSignature: string;
+  qrVerificationCode?: string;
+  dispensedStatus?: 'pending' | 'dispensed' | 'partial';
+  dispensedAt?: string;
+  dispensedByPharmacy?: string;
+  dispensedPharmacyLicense?: string;
 }
 
 export interface PersonalHealthRecord {
@@ -234,6 +247,7 @@ export interface PersonalHealthRecord {
   fileName: string;
   fileSize: string;
   tags: string[];
+  qrVerificationCode?: string;
   consent: {
     sharedWithDoctorId?: string;
     accessType: 'view_once' | 'during_appointment' | '30_days' | 'permanent';
@@ -281,4 +295,88 @@ export interface EmergencyGuide {
   firstAidSteps: string[];
   whatNotToDo: string[];
   callHotline: string;
+}
+
+export type InsuranceProviderType = 'ayushman_bharat' | 'private';
+
+export interface CoveredFamilyMember {
+  id: string;
+  name: string;
+  relation: string;
+  age: number;
+  gender?: string;
+  cardId: string;
+}
+
+export interface InsurancePolicy {
+  id: string;
+  patientId: string;
+  providerType: InsuranceProviderType;
+  providerName: string;
+  policyNumber: string;
+  tpaName?: string;
+  policyHolderName: string;
+  policyType: 'Family Floater' | 'Individual' | 'Senior Citizen Care' | 'Critical Illness';
+  sumInsured: number;
+  remainingAmount: number;
+  utilizedAmount: number;
+  startDate: string;
+  expiryDate: string;
+  status: 'active' | 'renewal_pending' | 'expired';
+  abhaId?: string;
+  digitalCardNumber: string;
+  qrVerificationCode: string;
+  coveredMembers: CoveredFamilyMember[];
+  coverageHighlights: {
+    cashlessHospitalCount: number;
+    ipdCoverage: string;
+    prePostHosp: string;
+    daycareSurgeries: string;
+    ambulanceLimit: string;
+    copay: string;
+    waitingPeriodInfo: string;
+  };
+  policyTier?: string;
+}
+
+export interface InsuranceClaimTimelineStep {
+  step: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  status: 'completed' | 'in_progress' | 'pending';
+}
+
+export interface InsuranceClaim {
+  id: string;
+  policyId: string;
+  policyNumber: string;
+  providerName: string;
+  providerType: InsuranceProviderType;
+  patientId: string;
+  patientName: string;
+  relationship: string;
+  hospitalName: string;
+  hospitalCity: string;
+  admissionType: 'Planned' | 'Emergency';
+  admissionDate: string;
+  dischargeDate?: string;
+  diagnosis: string;
+  claimType: 'Cashless' | 'Reimbursement';
+  claimedAmount: number;
+  approvedAmount: number;
+  settledAmount: number;
+  deductibleAmount: number;
+  status: 'submitted' | 'under_review' | 'pre_auth_approved' | 'settled' | 'query_raised';
+  stage: number; // 1 to 5
+  submittedAt: string;
+  lastUpdatedAt: string;
+  timeline: InsuranceClaimTimelineStep[];
+  tpaRemarks?: string;
+  documents?: {
+    name: string;
+    type: string;
+    date: string;
+    fileSize?: string;
+  }[];
 }

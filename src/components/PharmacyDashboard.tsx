@@ -8,11 +8,12 @@ import {
   Truck, 
   AlertTriangle,
   Search,
-  Building
+  Building,
+  QrCode
 } from 'lucide-react';
 
 export const PharmacyDashboard: React.FC = () => {
-  const { showNotification } = useApp();
+  const { user, showNotification, openLoginForRole, openQrScanner } = useApp();
   const [orders, setOrders] = useState([
     {
       id: 'ord_301',
@@ -52,29 +53,53 @@ export const PharmacyDashboard: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-bold tracking-tight text-slate-900">
-                Pharmacy Staff & Prescription Verification Portal
+                {user?.role === 'pharmacy' ? user.fullName : 'Pharmacy Staff & Prescription Verification Portal'}
               </h1>
               <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-900 text-white rounded">
-                Chemist Portal
+                PMBJP Chemist Portal
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Pradhan Mantri Bhartiya Janaushadhi Kendra · Connaught Place Outlet (DL-WZ-2021-9988)
+              {user?.pharmacyName || 'Pradhan Mantri Bhartiya Janaushadhi Kendra · Connaught Place Outlet'} · Lic: {user?.pharmacyLicenseNumber || 'DL-DLH-2021-99881'}
             </p>
           </div>
 
-          <span className="text-xs font-medium px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded border border-emerald-200">
-            Licensed PMBJP Distributor
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => openQrScanner('prescription')}
+              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-xs btn-press"
+              title="Scan digital prescription QR using camera"
+            >
+              <QrCode className="w-3.5 h-3.5" />
+              <span>Scan Prescription QR</span>
+            </button>
+
+            <button
+              onClick={() => openLoginForRole('pharmacy')}
+              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-medium transition cursor-pointer btn-press"
+            >
+              {user?.role === 'pharmacy' ? 'Switch Account' : 'Pharmacy Sign In'}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Prescription Review & Order Fulfillment Queue */}
       <div className="bg-white rounded-lg p-5 border border-slate-200 space-y-3.5">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-          <FileCheck className="w-4 h-4 text-emerald-700" />
-          <span>Prescription Verification & Fulfillment Queue ({orders.length})</span>
-        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+            <FileCheck className="w-4 h-4 text-emerald-700" />
+            <span>Prescription Verification & Fulfillment Queue ({orders.length})</span>
+          </h2>
+
+          <button
+            onClick={() => openQrScanner('prescription')}
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 cursor-pointer bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded transition"
+          >
+            <QrCode className="w-3.5 h-3.5" />
+            <span>Verify Live Prescription QR</span>
+          </button>
+        </div>
 
         <div className="space-y-2.5">
           {orders.map(order => (

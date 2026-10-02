@@ -14,7 +14,17 @@ import {
   ShieldAlert,
   ChevronDown,
   LocateFixed,
-  UserCheck
+  UserCheck,
+  LogIn,
+  LogOut,
+  Stethoscope,
+  Pill,
+  ShieldCheck,
+  User,
+  Lock,
+  Sparkles,
+  QrCode,
+  Camera
 } from 'lucide-react';
 
 const INDIAN_LANGUAGES_LIST: { code: IndianLanguage; label: string; nativeName: string }[] = [
@@ -60,12 +70,17 @@ export const Header: React.FC = () => {
     setIsEmergencyModalOpen, 
     switchRole,
     updateLocation,
-    showNotification
+    showNotification,
+    openLoginForRole,
+    setIsLoginModalOpen,
+    openQrScanner,
+    logout
   } = useApp();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [accessDropdownOpen, setAccessDropdownOpen] = useState(false);
   const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
@@ -131,6 +146,16 @@ export const Header: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3 text-[11px]">
+            {/* Camera Medical QR Scanner Button */}
+            <button
+              onClick={() => openQrScanner('all')}
+              className="flex items-center gap-1 px-2.5 py-0.5 rounded transition cursor-pointer bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 hover:text-white border border-emerald-700/80 shadow-2xs font-medium"
+              title="Scan Patient ABHA Card or Doctor Prescription QR code using camera"
+            >
+              <QrCode className="w-3 h-3 text-emerald-400" />
+              <span>Scan QR</span>
+            </button>
+
             {/* Low Bandwidth 2G Toggle */}
             <button
               onClick={() => setLowBandwidth(!lowBandwidth)}
@@ -226,44 +251,129 @@ export const Header: React.FC = () => {
               )}
             </div>
 
-            {/* Portal View Switcher */}
+            {/* Separate Role Portal Login & Account Dropdown */}
             <div className="relative">
               <button
-                onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-                className="text-slate-300 hover:text-white flex items-center gap-1 py-0.5 cursor-pointer"
-                title="Switch portal perspective"
+                onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded transition cursor-pointer text-[11px] ${
+                  user?.role && user.role !== 'patient'
+                    ? 'bg-sky-950 text-sky-200 border border-sky-800 font-semibold'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                }`}
+                title="Select role to login separately"
               >
-                <UserCheck className="w-3 h-3 text-slate-400" />
-                <span className="capitalize font-medium">{activeRole} Portal</span>
-                <ChevronDown className="w-2.5 h-2.5 opacity-60" />
+                {user?.role === 'doctor' ? (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <Stethoscope className="w-3 h-3 text-sky-400" />
+                    <span className="truncate max-w-[130px]">{user.fullName} (Doctor)</span>
+                  </>
+                ) : user?.role === 'pharmacy' ? (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <Pill className="w-3 h-3 text-teal-400" />
+                    <span className="truncate max-w-[130px]">Pharmacy Staff</span>
+                  </>
+                ) : user?.role === 'admin' ? (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <ShieldCheck className="w-3 h-3 text-rose-400" />
+                    <span>Administrator</span>
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-3 h-3 text-emerald-400" />
+                    <span>Portal Login / Sign In</span>
+                  </>
+                )}
+                <ChevronDown className="w-2.5 h-2.5 opacity-70" />
               </button>
 
-              {roleDropdownOpen && (
-                <div className="absolute right-0 mt-1.5 w-56 bg-white text-slate-900 rounded-md shadow-lg border border-slate-200 py-1 z-50 text-xs">
-                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 border-b border-slate-100">
-                    PORTAL VIEW
+              {loginDropdownOpen && (
+                <div className="absolute right-0 mt-1.5 w-64 bg-white text-slate-900 rounded-md shadow-xl border border-slate-200 py-1.5 z-50 text-xs">
+                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 border-b border-slate-100 flex items-center justify-between">
+                    <span>SEPARATE ROLE LOGINS</span>
+                    <span className="text-[9px] text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-semibold">NMC / ABDM</span>
                   </div>
-                  {[
-                    { role: 'patient' as UserRole, label: 'Citizen / Patient', desc: 'Appointments & health vault' },
-                    { role: 'doctor' as UserRole, label: 'Doctor / Physician', desc: 'OPD queue & digital Rx' },
-                    { role: 'hospital' as UserRole, label: 'Hospital Administration', desc: 'Beds, ICU & oxygen monitor' },
-                    { role: 'pharmacy' as UserRole, label: 'Pharmacy Staff', desc: 'Jan Aushadhi & Rx verify' },
-                    { role: 'admin' as UserRole, label: 'Platform Administrator', desc: 'Practitioner verification & audit' },
-                  ].map(r => (
-                    <button
-                      key={r.role}
-                      onClick={() => {
-                        switchRole(r.role);
-                        setRoleDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-50 cursor-pointer ${
-                        activeRole === r.role ? 'bg-sky-50 font-semibold text-sky-800' : 'text-slate-700'
-                      }`}
-                    >
-                      <p className="font-medium">{r.label}</p>
-                      <p className="text-[10px] text-slate-400 font-normal">{r.desc}</p>
-                    </button>
-                  ))}
+
+                  <button
+                    onClick={() => {
+                      openLoginForRole('doctor');
+                      setLoginDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 hover:bg-sky-50 transition cursor-pointer flex items-start gap-2.5 ${activeRole === 'doctor' ? 'bg-sky-50/70 border-l-2 border-sky-800' : ''}`}
+                  >
+                    <div className="w-6 h-6 rounded bg-sky-100 text-sky-800 flex items-center justify-center shrink-0 mt-0.5">
+                      <Stethoscope className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 block text-xs">Doctor Login</span>
+                      <span className="text-[10px] text-slate-500 block leading-tight">NMC Practitioner / OPD Consultation Console</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      openLoginForRole('patient');
+                      setLoginDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 hover:bg-emerald-50 transition cursor-pointer flex items-start gap-2.5 ${activeRole === 'patient' ? 'bg-emerald-50/70 border-l-2 border-emerald-800' : ''}`}
+                  >
+                    <div className="w-6 h-6 rounded bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
+                      <User className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 block text-xs">Patient / Citizen Login</span>
+                      <span className="text-[10px] text-slate-500 block leading-tight">ABHA ID · Health Records & Bookings</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      openLoginForRole('pharmacy');
+                      setLoginDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 hover:bg-teal-50 transition cursor-pointer flex items-start gap-2.5 ${activeRole === 'pharmacy' ? 'bg-teal-50/70 border-l-2 border-teal-800' : ''}`}
+                  >
+                    <div className="w-6 h-6 rounded bg-teal-100 text-teal-800 flex items-center justify-center shrink-0 mt-0.5">
+                      <Pill className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 block text-xs">Pharmacy Staff Login</span>
+                      <span className="text-[10px] text-slate-500 block leading-tight">PMBJP Jan Aushadhi Dispenser & Inventory</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      openLoginForRole('admin');
+                      setLoginDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 hover:bg-rose-50 transition cursor-pointer flex items-start gap-2.5 ${activeRole === 'admin' ? 'bg-rose-50/70 border-l-2 border-rose-800' : ''}`}
+                  >
+                    <div className="w-6 h-6 rounded bg-rose-100 text-rose-800 flex items-center justify-center shrink-0 mt-0.5">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 block text-xs">Platform Administrator</span>
+                      <span className="text-[10px] text-slate-500 block leading-tight">NHA Medical Audits & Provider Verification</span>
+                    </div>
+                  </button>
+
+                  {user?.role && user.role !== 'patient' && (
+                    <div className="pt-1 mt-1 border-t border-slate-100 px-2">
+                      <button
+                        onClick={() => {
+                          logout();
+                          setLoginDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-2 py-1.5 text-xs text-red-700 hover:bg-red-50 rounded flex items-center gap-1.5 transition cursor-pointer"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span>Sign Out of {activeRole.toUpperCase()} Portal</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -402,11 +512,63 @@ export const Header: React.FC = () => {
             </div>
           </nav>
 
-          {/* Right Action: PWA + High Visibility Emergency Help */}
+          {/* Right Action: PWA + Login + High Visibility Emergency Help */}
           <div className="flex items-center gap-2.5">
             <div className="hidden md:block">
               <PWAInstallButton />
             </div>
+
+            {/* Live Camera QR Scanner Trigger */}
+            <button
+              onClick={() => openQrScanner('all')}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 transition cursor-pointer shadow-2xs btn-press"
+              title="Open camera to scan Patient Medical Record or Pharmacy Prescription QR"
+            >
+              <QrCode className="w-3.5 h-3.5 text-emerald-700" />
+              <span className="hidden sm:inline">Scan Medical QR</span>
+              <span className="sm:hidden">Scan QR</span>
+            </button>
+
+            {/* Direct Role Login Button in Main Navbar */}
+            {user?.role && user.role !== 'patient' ? (
+              <button
+                onClick={() => {
+                  if (user.role === 'doctor') setActiveTab('doctor_portal');
+                  else if (user.role === 'pharmacy') setActiveTab('pharmacy_portal');
+                  else if (user.role === 'admin') setActiveTab('admin_portal');
+                  else setActiveTab('hospital_portal');
+                }}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded border border-sky-300 bg-sky-50 hover:bg-sky-100 text-sky-900 transition cursor-pointer btn-press"
+                title="Go to my active portal workstation"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                {user.role === 'doctor' ? (
+                  <>
+                    <Stethoscope className="w-3.5 h-3.5 text-sky-800" />
+                    <span>Doctor Workstation</span>
+                  </>
+                ) : user.role === 'pharmacy' ? (
+                  <>
+                    <Pill className="w-3.5 h-3.5 text-teal-800" />
+                    <span>Pharmacy Console</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="w-3.5 h-3.5 text-rose-800" />
+                    <span>Admin Command</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={() => openLoginForRole('doctor')}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 transition cursor-pointer btn-press shadow-xs"
+                title="Sign in separately as Doctor, Patient, Pharmacy Staff, or Platform Administrator"
+              >
+                <LogIn className="w-3.5 h-3.5 text-sky-800" />
+                <span>Doctor / Staff Login</span>
+              </button>
+            )}
 
             <button
               onClick={() => setIsEmergencyModalOpen(true)}
@@ -439,6 +601,13 @@ export const Header: React.FC = () => {
             >
               Home Overview
             </button>
+            <button
+              onClick={() => { openQrScanner('all'); setMobileMenuOpen(false); }}
+              className="w-full text-left px-3 py-2 text-xs font-bold rounded bg-emerald-50 text-emerald-900 border border-emerald-200 flex items-center gap-2 cursor-pointer"
+            >
+              <QrCode className="w-4 h-4 text-emerald-700 shrink-0" />
+              <span>Scan Medical QR / Prescription</span>
+            </button>
             {navItems.map(item => (
               <button
                 key={item.id}
@@ -466,6 +635,56 @@ export const Header: React.FC = () => {
                 {item.label}
               </button>
             ))}
+
+            {/* Separate Role Portals Login on Mobile */}
+            <div className="pt-2 pb-1 border-t border-slate-200 mt-2">
+              <span className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                Separate Role Portal Logins
+              </span>
+              <div className="grid grid-cols-2 gap-1.5 px-2">
+                <button
+                  onClick={() => { openLoginForRole('doctor'); setMobileMenuOpen(false); }}
+                  className="p-2 rounded bg-sky-50 hover:bg-sky-100 text-sky-900 text-xs font-bold flex items-center gap-1.5 text-left transition cursor-pointer"
+                >
+                  <Stethoscope className="w-3.5 h-3.5 text-sky-700 shrink-0" />
+                  <span>Doctor Login</span>
+                </button>
+                <button
+                  onClick={() => { openLoginForRole('patient'); setMobileMenuOpen(false); }}
+                  className="p-2 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold flex items-center gap-1.5 text-left transition cursor-pointer"
+                >
+                  <User className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <span>Patient Login</span>
+                </button>
+                <button
+                  onClick={() => { openLoginForRole('pharmacy'); setMobileMenuOpen(false); }}
+                  className="p-2 rounded bg-teal-50 hover:bg-teal-100 text-teal-900 text-xs font-bold flex items-center gap-1.5 text-left transition cursor-pointer"
+                >
+                  <Pill className="w-3.5 h-3.5 text-teal-700 shrink-0" />
+                  <span>Pharmacy Login</span>
+                </button>
+                <button
+                  onClick={() => { openLoginForRole('admin'); setMobileMenuOpen(false); }}
+                  className="p-2 rounded bg-rose-50 hover:bg-rose-100 text-rose-900 text-xs font-bold flex items-center gap-1.5 text-left transition cursor-pointer"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-rose-700 shrink-0" />
+                  <span>Admin Login</span>
+                </button>
+              </div>
+
+              {user?.role && user.role !== 'patient' && (
+                <div className="px-2 pt-2">
+                  <button
+                    onClick={() => { logout(); setMobileMenuOpen(false); }}
+                    className="w-full p-2 rounded bg-red-50 text-red-700 hover:bg-red-100 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out of {user.role.toUpperCase()} Portal</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between px-3">
               <PWAInstallButton />
             </div>

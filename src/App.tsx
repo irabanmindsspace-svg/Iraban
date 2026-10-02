@@ -3,6 +3,8 @@ import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { EmergencyModal } from './components/EmergencyModal';
+import { LoginModal } from './components/LoginModal';
+import { QRScannerModal } from './components/QRScannerModal';
 import { HomeOverview } from './components/HomeOverview';
 import { DoctorSearch } from './components/DoctorSearch';
 import { HospitalSearch } from './components/HospitalSearch';
@@ -82,6 +84,12 @@ const AppContent: React.FC = () => {
 
       {/* Emergency Modal */}
       <EmergencyModal />
+
+      {/* Role-Specific Portal Login Modal */}
+      <LoginModal />
+
+      {/* ABDM Verified Medical QR Scanner Modal */}
+      <QRScannerModal />
 
       {/* Booking Modal */}
       {activeDoctorForBooking && (

@@ -13,6 +13,7 @@ export type NavigationTab =
   | 'labs'
   | 'blood'
   | 'records'
+  | 'insurance'
   | 'reminders'
   | 'schemes'
   | 'healthguide'
@@ -36,6 +37,10 @@ interface AppContextType {
   selectedDoctorForBooking: Doctor | null;
   activeTeleconsultationAppointment: Appointment | null;
   notificationMessage: string | null;
+  isLoginModalOpen: boolean;
+  loginTargetRole: UserRole;
+  isQrScannerOpen: boolean;
+  qrScannerScope: 'all' | 'prescription' | 'patient_records';
   
   // Actions
   setLanguage: (lang: IndianLanguage) => void;
@@ -44,8 +49,16 @@ interface AppContextType {
   setHighContrast: (val: boolean) => void;
   setTextSize: (size: TextSize) => void;
   setIsEmergencyModalOpen: (open: boolean) => void;
+  setIsLoginModalOpen: (open: boolean) => void;
+  setLoginTargetRole: (role: UserRole) => void;
+  openLoginForRole: (role: UserRole) => void;
+  setIsQrScannerOpen: (open: boolean) => void;
+  openQrScanner: (scope?: 'all' | 'prescription' | 'patient_records') => void;
   setSelectedDoctorForBooking: (doc: Doctor | null) => void;
   setActiveTeleconsultationAppointment: (apt: Appointment | null) => void;
+  login: (credentials: { role: UserRole; identifier?: string; password?: string; extraCredentials?: Record<string, string> }) => Promise<{ success: boolean; message?: string }>;
+  biometricLogin: (role: UserRole, biometricType?: string) => Promise<{ success: boolean; message?: string }>;
+  logout: () => Promise<void>;
   switchRole: (role: UserRole) => Promise<void>;
   updateLocation: (loc: Partial<UserProfile['location']>) => Promise<void>;
   showNotification: (msg: string) => void;
@@ -63,6 +76,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [highContrast, setHighContrastState] = useState<boolean>(false);
   const [textSize, setTextSizeState] = useState<TextSize>('normal');
   const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState<boolean>(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [loginTargetRole, setLoginTargetRole] = useState<UserRole>('doctor');
+  const [isQrScannerOpen, setIsQrScannerOpen] = useState<boolean>(false);
+  const [qrScannerScope, setQrScannerScope] = useState<'all' | 'prescription' | 'patient_records'>('all');
   const [selectedDoctorForBooking, setSelectedDoctorForBooking] = useState<Doctor | null>(null);
   const [activeTeleconsultationAppointment, setActiveTeleconsultationAppointment] = useState<Appointment | null>(null);
   const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
@@ -111,6 +128,88 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const setTextSize = (size: TextSize) => {
     setTextSizeState(size);
     localStorage.setItem('sanjeevani_textsize', size);
+  };
+
+  const openLoginForRole = (role: UserRole) => {
+    setLoginTargetRole(role);
+    setIsLoginModalOpen(true);
+  };
+
+  const openQrScanner = (scope: 'all' | 'prescription' | 'patient_records' = 'all') => {
+    setQrScannerScope(scope);
+    setIsQrScannerOpen(true);
+  };
+
+  const login = async (credentials: {
+    role: UserRole;
+    identifier?: string;
+    password?: string;
+    extraCredentials?: Record<string, string>;
+  }) => {
+    try {
+      const res = await api.login(credentials);
+      if (res.success && res.user) {
+        setUser(res.user);
+        setActiveRole(credentials.role);
+        setIsLoginModalOpen(false);
+
+        // Route to respective role portal
+        if (credentials.role === 'doctor') setActiveTab('doctor_portal');
+        else if (credentials.role === 'pharmacy') setActiveTab('pharmacy_portal');
+        else if (credentials.role === 'admin') setActiveTab('admin_portal');
+        else if (credentials.role === 'hospital') setActiveTab('hospital_portal');
+        else setActiveTab('home');
+
+        showNotification(res.message || `Welcome, ${res.user.fullName}!`);
+        return { success: true, message: res.message };
+      }
+      return { success: false, message: res.message || 'Login failed' };
+    } catch (err: any) {
+      console.error('Login error:', err);
+      return { success: false, message: err.message || 'Network error during login' };
+    }
+  };
+
+  const biometricLogin = async (role: UserRole, biometricType: string = 'Touch ID / Face ID') => {
+    try {
+      const res = await api.biometricLogin({ 
+        role, 
+        biometricType, 
+        credentialId: `fido2_${role}_${Date.now()}` 
+      });
+      if (res.success && res.user) {
+        setUser(res.user);
+        setActiveRole(role);
+        setIsLoginModalOpen(false);
+
+        if (role === 'doctor') setActiveTab('doctor_portal');
+        else if (role === 'patient') setActiveTab('home');
+
+        showNotification(res.message || `Biometric authentication verified for ${res.user.fullName}.`);
+        return { success: true, message: res.message };
+      }
+      return { success: false, message: res.message || 'Biometric authentication failed' };
+    } catch (err: any) {
+      console.error('Biometric authentication error:', err);
+      return { success: false, message: err.message || 'Biometric sensor error' };
+    }
+  };
+
+  const logout = async () => {
+    try {
+      const res = await api.logout();
+      if (res.success && res.user) {
+        setUser(res.user);
+        setActiveRole('patient');
+        setActiveTab('home');
+        showNotification('You have logged out. Returned to Public Patient Portal.');
+      }
+    } catch (err) {
+      console.error('Logout error:', err);
+      // Fallback reset
+      setActiveRole('patient');
+      setActiveTab('home');
+    }
   };
 
   const switchRole = async (role: UserRole) => {
@@ -172,6 +271,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       highContrast,
       textSize,
       isEmergencyModalOpen,
+      isLoginModalOpen,
+      loginTargetRole,
+      isQrScannerOpen,
+      qrScannerScope,
       selectedDoctorForBooking,
       activeTeleconsultationAppointment,
       notificationMessage,
@@ -181,8 +284,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setHighContrast,
       setTextSize,
       setIsEmergencyModalOpen,
+      setIsLoginModalOpen,
+      setLoginTargetRole,
+      openLoginForRole,
+      setIsQrScannerOpen,
+      openQrScanner,
       setSelectedDoctorForBooking,
       setActiveTeleconsultationAppointment,
+      login,
+      biometricLogin,
+      logout,
       switchRole,
       updateLocation,
       showNotification,

@@ -25,6 +25,37 @@ export const api = {
     return res.json();
   },
 
+  async login(credentials: {
+    role: UserRole;
+    identifier?: string;
+    password?: string;
+    extraCredentials?: Record<string, string>;
+  }): Promise<{ success: boolean; message: string; user: UserProfile; token?: string }> {
+    const res = await fetch(`${BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+    });
+    return res.json();
+  },
+
+  async biometricLogin(data: { role: UserRole; biometricType?: string; credentialId?: string }): Promise<{ success: boolean; message: string; user: UserProfile; token?: string }> {
+    const res = await fetch(`${BASE_URL}/auth/biometric-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return res.json();
+  },
+
+  async logout(): Promise<{ success: boolean; message: string; user: UserProfile }> {
+    const res = await fetch(`${BASE_URL}/auth/logout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return res.json();
+  },
+
   async switchRole(role: UserRole): Promise<{ success: boolean; user: UserProfile }> {
     const res = await fetch(`${BASE_URL}/auth/switch-role`, {
       method: 'POST',
@@ -110,6 +141,40 @@ export const api = {
   // Digital Prescriptions
   async getPrescriptions(): Promise<{ success: boolean; prescriptions: DigitalPrescription[] }> {
     const res = await fetch(`${BASE_URL}/prescriptions`);
+    return res.json();
+  },
+
+  async getPrescriptionById(id: string): Promise<{ success: boolean; prescription: DigitalPrescription }> {
+    const res = await fetch(`${BASE_URL}/prescriptions/${id}`);
+    return res.json();
+  },
+
+  async dispensePrescription(id: string, details?: { pharmacyName?: string; pharmacyLicense?: string }): Promise<{ success: boolean; prescription: DigitalPrescription }> {
+    const res = await fetch(`${BASE_URL}/prescriptions/${id}/dispense`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(details || {}),
+    });
+    return res.json();
+  },
+
+  async verifyQrCode(qrData: string): Promise<{
+    success: boolean;
+    type?: 'prescription' | 'patient_record' | 'appointment' | 'custom_qr';
+    prescription?: DigitalPrescription;
+    patient?: any;
+    records?: PersonalHealthRecord[];
+    singleRecord?: PersonalHealthRecord | null;
+    appointment?: any;
+    verification?: any;
+    rawData?: string;
+    message?: string;
+  }> {
+    const res = await fetch(`${BASE_URL}/qr/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ qrData }),
+    });
     return res.json();
   },
 

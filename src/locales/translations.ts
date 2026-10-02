@@ -12,6 +12,7 @@ export interface LocaleStrings {
   findLabs: string;
   bloodBanks: string;
   healthRecords: string;
+  healthInsurance?: string;
   familyHealth: string;
   govtSchemes: string;
   medReminders: string;
@@ -47,6 +48,7 @@ export const TRANSLATIONS: Record<IndianLanguage, LocaleStrings> = {
     findLabs: 'Diagnostic Labs',
     bloodBanks: 'Blood Availability',
     healthRecords: 'My Health Records (PHR)',
+    healthInsurance: 'Health Insurance',
     familyHealth: 'Family Health',
     govtSchemes: 'Government Schemes',
     medReminders: 'Medication Reminders',
@@ -80,6 +82,7 @@ export const TRANSLATIONS: Record<IndianLanguage, LocaleStrings> = {
     findLabs: 'जांच प्रयोगशालाएं',
     bloodBanks: 'ब्लड बैंक उपलब्धता',
     healthRecords: 'स्वास्थ्य रिकॉर्ड (PHR)',
+    healthInsurance: 'स्वास्थ्य बीमा व क्लेम',
     familyHealth: 'पारिवारिक स्वास्थ्य',
     govtSchemes: 'सरकारी स्वास्थ्य योजनाएं',
     medReminders: 'दवा अनुस्मारक',

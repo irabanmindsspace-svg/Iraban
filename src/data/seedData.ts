@@ -11,7 +11,10 @@ import {
   UserProfile,
   Appointment,
   PersonalHealthRecord,
-  MedicationReminder
+  MedicationReminder,
+  DigitalPrescription,
+  InsurancePolicy,
+  InsuranceClaim
 } from '../types';
 
 export const INITIAL_USER: UserProfile = {
@@ -65,6 +68,90 @@ export const INITIAL_USER: UserProfile = {
       emergencyContact: '+91 98765 43210',
     }
   ]
+};
+
+export const DEFAULT_ROLE_USERS: Record<string, UserProfile> = {
+  patient: {
+    ...INITIAL_USER
+  },
+  doctor: {
+    id: 'usr_doc_101',
+    fullName: 'Dr. Priya Venkatesh',
+    phone: '+91 98101 22345',
+    email: 'priya.venkatesh@aiims.gov.in',
+    role: 'doctor',
+    doctorRegistrationNumber: 'MCI-2012-44192',
+    medicalCouncil: 'National Medical Commission (NMC) & Delhi Council',
+    specialization: 'General Physician & Senior Cardiologist',
+    hospitalAffiliation: 'AIIMS Apex Trauma Center, New Delhi',
+    location: {
+      state: 'Delhi',
+      district: 'South Delhi',
+      city: 'New Delhi',
+      pincode: '110029',
+      address: 'Department of Cardiology, AIIMS Ansari Nagar',
+      lat: 28.5672,
+      lng: 77.2100,
+    },
+    dependents: []
+  },
+  pharmacy: {
+    id: 'usr_pharm_502',
+    fullName: 'Alok Gupta (Chief Pharmacist)',
+    phone: '+91 98202 33456',
+    email: 'alok.gupta@janaushadhi.gov.in',
+    role: 'pharmacy',
+    pharmacyLicenseNumber: 'DL-DLH-2021-99881',
+    pharmacyName: 'Pradhan Mantri Jan Aushadhi Kendra (Outlet #4102)',
+    location: {
+      state: 'Delhi',
+      district: 'Central Delhi',
+      city: 'New Delhi',
+      pincode: '110001',
+      address: 'Shop 14, Janpath Medical Market, Connaught Place',
+      lat: 28.6289,
+      lng: 77.2065,
+    },
+    dependents: []
+  },
+  admin: {
+    id: 'usr_admin_001',
+    fullName: 'Dr. Vinod K. Paul (Director General)',
+    phone: '+91 98000 11223',
+    email: 'admin.audit@nha.gov.in',
+    role: 'admin',
+    department: 'National Health Authority (NHA) & Regulatory Command',
+    adminClearanceLevel: 'Level 5 (Super Admin Clearance)',
+    location: {
+      state: 'Delhi',
+      district: 'New Delhi',
+      city: 'New Delhi',
+      pincode: '110001',
+      address: '9th Floor, Tower 1, Jeevan Bharati Building, Connaught Place',
+      lat: 28.6304,
+      lng: 77.2177,
+    },
+    dependents: []
+  },
+  hospital: {
+    id: 'usr_hosp_301',
+    fullName: 'Dr. Sanjeev Bagai (Medical Superintendent)',
+    phone: '+91 98333 44556',
+    email: 'superintendent@aiims.gov.in',
+    role: 'hospital',
+    hospitalAffiliation: 'AIIMS Apex Emergency Trauma Center',
+    department: 'Hospital Administration & Bed Allocation Board',
+    location: {
+      state: 'Delhi',
+      district: 'South Delhi',
+      city: 'New Delhi',
+      pincode: '110029',
+      address: 'Ansari Nagar, Ring Road, New Delhi',
+      lat: 28.5672,
+      lng: 77.2100,
+    },
+    dependents: []
+  }
 };
 
 export const INITIAL_DOCTORS: Doctor[] = [
@@ -871,6 +958,7 @@ export const INITIAL_HEALTH_RECORDS: PersonalHealthRecord[] = [
     fileName: 'lipid_hba1c_sep2026.pdf',
     fileSize: '420 KB',
     tags: ['HbA1c: 6.8%', 'Total Cholesterol: 198 mg/dL', 'Routine Test'],
+    qrVerificationCode: 'SNJ-REC-501',
     consent: {
       sharedWithDoctorId: 'doc_1',
       accessType: 'during_appointment',
@@ -897,6 +985,7 @@ export const INITIAL_HEALTH_RECORDS: PersonalHealthRecord[] = [
     fileName: 'prescription_june_2026.pdf',
     fileSize: '210 KB',
     tags: ['Metformin 500mg SR', 'Telmisartan 40mg', 'Lifestyle Advice'],
+    qrVerificationCode: 'SNJ-REC-502',
     consent: {
       accessType: 'permanent',
       revoked: false,
@@ -914,11 +1003,116 @@ export const INITIAL_HEALTH_RECORDS: PersonalHealthRecord[] = [
     fileName: 'chest_xray_pa_view.png',
     fileSize: '1.8 MB',
     tags: ['Clear lung fields', 'Normal cardiothoracic ratio'],
+    qrVerificationCode: 'SNJ-REC-503',
     consent: {
       accessType: 'view_once',
       revoked: false,
     },
     accessLogs: []
+  }
+];
+
+export const INITIAL_PRESCRIPTIONS: DigitalPrescription[] = [
+  {
+    id: 'rx_301',
+    appointmentId: 'apt_1001',
+    doctorId: 'doc_1',
+    doctorName: 'Dr. Priya Venkatesh',
+    registrationNumber: 'MCI-2012-44192',
+    patientId: 'usr_pat_9901',
+    patientName: 'Rajesh Sharma',
+    patientAge: 48,
+    date: '2026-09-30',
+    vitals: {
+      bp: '128/84 mmHg',
+      pulse: '76 bpm',
+      temperature: '98.4°F',
+      spO2: '99%',
+      weight: '74 kg',
+    },
+    diagnosis: 'Type 2 Diabetes Mellitus & Stage 1 Essential Hypertension',
+    medicines: [
+      {
+        medicineName: 'Glycomet 500 SR',
+        genericName: 'Metformin Hydrochloride Prolonged-Release IP 500mg',
+        dosage: '500 mg',
+        frequency: '1-0-1',
+        timing: 'After Food',
+        duration: '30 days',
+        instructions: 'Take with or immediately after meals with a full glass of water. Jan Aushadhi generic substitution authorized.',
+      },
+      {
+        medicineName: 'Telma 40',
+        genericName: 'Telmisartan Tablets IP 40mg',
+        dosage: '40 mg',
+        frequency: '1-0-0',
+        timing: 'After Food',
+        duration: '30 days',
+        instructions: 'Take once daily in the morning after breakfast. Monitor BP weekly.',
+      },
+      {
+        medicineName: 'Shelcal 500',
+        genericName: 'Calcium Carbonate and Vitamin D3 Tablets IP',
+        dosage: '500 mg / 250 IU',
+        frequency: '0-0-1',
+        timing: 'After Food',
+        duration: '15 days',
+        instructions: 'Take at night after dinner.',
+      }
+    ],
+    testsRecommended: ['Fasting Blood Sugar & HbA1c in 3 months', 'Annual Serum Creatinine & eGFR'],
+    lifestyleAdvice: '30 minutes daily brisk walk. Restrict salt to < 5g/day. Avoid refined sugars and trans fats. Maintain regular sleep cycle.',
+    followUpDate: '2026-10-30',
+    digitalSignature: 'SHA256-ECDSA-VERIFIED:NMC-MCI-44192:PR_VENKATESH_DOC1',
+    qrVerificationCode: 'SNJ-RX-301',
+    dispensedStatus: 'pending',
+  },
+  {
+    id: 'rx_302',
+    appointmentId: 'apt_1002',
+    doctorId: 'doc_2',
+    doctorName: 'Dr. Anand K. Deshmukh',
+    registrationNumber: 'MMC-2008-88319',
+    patientId: 'dep_3',
+    patientName: 'Rameshwar Sharma (Father)',
+    patientAge: 72,
+    date: '2026-10-02',
+    vitals: {
+      bp: '136/88 mmHg',
+      pulse: '72 bpm',
+      spO2: '97%',
+      weight: '68 kg',
+    },
+    diagnosis: 'Stable Angina / Coronary Artery Disease & Dyslipidemia',
+    medicines: [
+      {
+        medicineName: 'Atorva 20',
+        genericName: 'Atorvastatin Tablets IP 20mg',
+        dosage: '20 mg',
+        frequency: '0-0-1',
+        timing: 'At Bedtime',
+        duration: '60 days',
+        instructions: 'Take every evening at bedtime. Jan Aushadhi generic available at 80% discount.',
+      },
+      {
+        medicineName: 'Ecosprin 75',
+        genericName: 'Aspirin Gastro-resistant Tablets IP 75mg',
+        dosage: '75 mg',
+        frequency: '0-1-0',
+        timing: 'After Food',
+        duration: '60 days',
+        instructions: 'Do not crush or chew. Take after lunch.',
+      }
+    ],
+    testsRecommended: ['Lipid Profile repeat after 8 weeks', '2D Echocardiogram in 6 months'],
+    lifestyleAdvice: 'Low-cholesterol heart-healthy diet. Light walking, avoid heavy lifting.',
+    followUpDate: '2026-12-02',
+    digitalSignature: 'SHA256-ECDSA-VERIFIED:MMC-88319:AK_DESHMUKH_DOC2',
+    qrVerificationCode: 'SNJ-RX-302',
+    dispensedStatus: 'dispensed',
+    dispensedAt: '2026-10-02T10:15:00Z',
+    dispensedByPharmacy: 'Pradhan Mantri Bhartiya Janaushadhi Kendra (Connaught Place)',
+    dispensedPharmacyLicense: 'DL-DLH-2021-99881',
   }
 ];
 
@@ -948,3 +1142,215 @@ export const INITIAL_REMINDERS: MedicationReminder[] = [
     }
   }
 ];
+
+export const INITIAL_INSURANCE_POLICIES: InsurancePolicy[] = [
+  {
+    id: 'pol_pmjay_01',
+    patientId: 'usr_pat_9901',
+    providerType: 'ayushman_bharat',
+    providerName: 'Ayushman Bharat Pradhan Mantri Jan Arogya Yojana (AB-PMJAY)',
+    policyNumber: 'PMJAY-DL-2024-8849-012',
+    tpaName: 'National Health Authority (NHA) & State Health Agency (SHA)',
+    policyHolderName: 'Rajesh Sharma',
+    policyType: 'Family Floater',
+    sumInsured: 500000,
+    remainingAmount: 380000,
+    utilizedAmount: 120000,
+    startDate: '2026-01-01',
+    expiryDate: '2026-12-31',
+    status: 'active',
+    abhaId: '91-8842-1209-7712',
+    digitalCardNumber: 'AB-PMJAY-CARD-9901-DEL',
+    qrVerificationCode: 'PMJAY-GOLDEN-CARD-91884212097712',
+    policyTier: 'National Golden Health Card (BIS 2.0 Empanelled)',
+    coveredMembers: [
+      { id: 'usr_pat_9901', name: 'Rajesh Sharma', relation: 'Self (Head of Family)', age: 46, gender: 'Male', cardId: 'PMJAY-9901-01' },
+      { id: 'dep_1', name: 'Sunita Sharma', relation: 'Spouse', age: 44, gender: 'Female', cardId: 'PMJAY-9901-02' },
+      { id: 'dep_2', name: 'Aarav Sharma', relation: 'Child', age: 12, gender: 'Male', cardId: 'PMJAY-9901-03' },
+      { id: 'dep_3', name: 'Rameshwar Sharma', relation: 'Elderly Dependent / Father', age: 72, gender: 'Male', cardId: 'PMJAY-9901-04' }
+    ],
+    coverageHighlights: {
+      cashlessHospitalCount: 29500,
+      ipdCoverage: '100% Cashless across all empanelled public & private hospitals nationwide',
+      prePostHosp: '3 days pre-hospitalization & 15 days post-hospitalization diagnostic & medicines covered',
+      daycareSurgeries: '1,949 medical packages & day care surgical procedures covered',
+      ambulanceLimit: 'Covered via Free 102/108 Ambulance Network',
+      copay: '0% Co-Payment (Completely Free Treatment for Beneficiaries)',
+      waitingPeriodInfo: 'Zero waiting period for pre-existing diseases from Day 1'
+    }
+  },
+  {
+    id: 'pol_star_02',
+    patientId: 'usr_pat_9901',
+    providerType: 'private',
+    providerName: 'Star Health & Allied Insurance - Family Health Optima',
+    policyNumber: 'SHAI-FHO-2025-9981240',
+    tpaName: 'In-House Cashless Claims Management (Star Health TPA)',
+    policyHolderName: 'Rajesh Sharma',
+    policyType: 'Family Floater',
+    sumInsured: 1000000,
+    remainingAmount: 925000,
+    utilizedAmount: 75000,
+    startDate: '2026-03-15',
+    expiryDate: '2027-03-14',
+    status: 'active',
+    abhaId: '91-8842-1209-7712',
+    digitalCardNumber: 'STAR-TPA-CARD-2026-098',
+    qrVerificationCode: 'STAR-HEALTH-POLICY-9981240',
+    policyTier: 'Gold Comprehensive Floater + Automatic Restoration Benefit',
+    coveredMembers: [
+      { id: 'usr_pat_9901', name: 'Rajesh Sharma', relation: 'Self', age: 46, gender: 'Male', cardId: 'SHAI-9901-A' },
+      { id: 'dep_1', name: 'Sunita Sharma', relation: 'Spouse', age: 44, gender: 'Female', cardId: 'SHAI-9901-B' },
+      { id: 'dep_2', name: 'Aarav Sharma', relation: 'Child', age: 12, gender: 'Male', cardId: 'SHAI-9901-C' }
+    ],
+    coverageHighlights: {
+      cashlessHospitalCount: 14200,
+      ipdCoverage: 'Single Private AC Room without room rent capping',
+      prePostHosp: '60 days Pre-Hospitalization & 90 days Post-Hospitalization expenses covered',
+      daycareSurgeries: 'All Day-care surgical procedures covered under modern treatment guidelines',
+      ambulanceLimit: '₹3,000 per hospitalization + Air Ambulance coverage up to ₹2,50,000',
+      copay: 'Zero co-pay at network hospitals (20% co-pay only if non-network without intimation)',
+      waitingPeriodInfo: 'Initial 30 days served; Pre-existing covered after 24 months (Active)'
+    }
+  }
+];
+
+export const INITIAL_INSURANCE_CLAIMS: InsuranceClaim[] = [
+  {
+    id: 'clm_star_102',
+    policyId: 'pol_star_02',
+    policyNumber: 'SHAI-FHO-2025-9981240',
+    providerName: 'Star Health & Allied Insurance',
+    providerType: 'private',
+    patientId: 'usr_pat_9901',
+    patientName: 'Rajesh Sharma',
+    relationship: 'Self',
+    hospitalName: 'Max Super Speciality Hospital (Saket)',
+    hospitalCity: 'New Delhi',
+    admissionType: 'Planned',
+    admissionDate: '2026-09-24',
+    dischargeDate: '2026-09-26',
+    diagnosis: 'Laparoscopic Cholecystectomy & Post-op Recovery',
+    claimType: 'Cashless',
+    claimedAmount: 85000,
+    approvedAmount: 75000,
+    settledAmount: 0,
+    deductibleAmount: 10000,
+    status: 'pre_auth_approved',
+    stage: 4,
+    submittedAt: '2026-09-24T09:15:00Z',
+    lastUpdatedAt: '2026-09-26T16:45:00Z',
+    tpaRemarks: 'Pre-authorization sanctioned for ₹75,000 cashless admission. Final discharge summary audit under process for final settlement.',
+    timeline: [
+      {
+        step: '1',
+        title: 'Cashless Pre-Auth Intimation',
+        description: 'Hospital TPA desk submitted e-intimation form with clinical diagnosis and doctor prescription.',
+        timestamp: '2026-09-24 09:15 AM',
+        status: 'completed'
+      },
+      {
+        step: '2',
+        title: 'Initial Document Scrutiny',
+        description: 'Medical scrutiny officer validated policy continuity and active network empanelment.',
+        timestamp: '2026-09-24 10:30 AM',
+        status: 'completed'
+      },
+      {
+        step: '3',
+        title: 'Pre-Auth Approval Letter Issued',
+        description: 'Pre-authorization approval letter of ₹75,000 transmitted directly to Max Super Speciality Hospital.',
+        timestamp: '2026-09-24 11:45 AM',
+        status: 'completed'
+      },
+      {
+        step: '4',
+        title: 'Patient Discharged & Final Bills Uploaded',
+        description: 'Hospital uploaded final itemized bill (₹85,000) and operative discharge note.',
+        timestamp: '2026-09-26 04:45 PM',
+        status: 'completed'
+      },
+      {
+        step: '5',
+        title: 'Final Claim Settlement & Payment Disbursal',
+        description: 'Adjudication audit under progress. Expected cashless disbursal within 24 hours.',
+        timestamp: 'Pending Final Audit',
+        status: 'in_progress'
+      }
+    ],
+    documents: [
+      { name: 'Pre-Auth Approval Letter.pdf', type: 'Approval Letter', date: '2026-09-24', fileSize: '1.2 MB' },
+      { name: 'Hospital Final Bill & Itemized Pharmacy.pdf', type: 'Hospital Bill', date: '2026-09-26', fileSize: '3.4 MB' },
+      { name: 'Discharge Summary & Histopathology.pdf', type: 'Discharge Summary', date: '2026-09-26', fileSize: '2.1 MB' }
+    ]
+  },
+  {
+    id: 'clm_pmjay_101',
+    policyId: 'pol_pmjay_01',
+    policyNumber: 'PMJAY-DL-2024-8849-012',
+    providerName: 'Ayushman Bharat PM-JAY',
+    providerType: 'ayushman_bharat',
+    patientId: 'dep_3',
+    patientName: 'Rameshwar Sharma',
+    relationship: 'Father',
+    hospitalName: 'AIIMS Apex Trauma & Cardiology Center',
+    hospitalCity: 'New Delhi',
+    admissionType: 'Emergency',
+    admissionDate: '2026-08-10',
+    dischargeDate: '2026-08-14',
+    diagnosis: 'Coronary Angiography & DES Drug-Eluting Stenting (CAD)',
+    claimType: 'Cashless',
+    claimedAmount: 120000,
+    approvedAmount: 120000,
+    settledAmount: 120000,
+    deductibleAmount: 0,
+    status: 'settled',
+    stage: 5,
+    submittedAt: '2026-08-10T14:30:00Z',
+    lastUpdatedAt: '2026-08-15T11:00:00Z',
+    tpaRemarks: '100% Cashless package approved under PM-JAY cardiology procedure code ST002. Disbursed directly to AIIMS New Delhi with ₹0 out-of-pocket for beneficiary.',
+    timeline: [
+      {
+        step: '1',
+        title: 'Emergency Admission & Golden Card Authentication',
+        description: 'AB-PMJAY Golden Card biometric verified at AIIMS Ayushman Mitra Helpdesk.',
+        timestamp: '2026-08-10 02:30 PM',
+        status: 'completed'
+      },
+      {
+        step: '2',
+        title: 'Clinical Package Booking',
+        description: 'Standard package code ST002 (Coronary Angiography & Stent) locked in TMS portal.',
+        timestamp: '2026-08-10 03:15 PM',
+        status: 'completed'
+      },
+      {
+        step: '3',
+        title: 'Pre-Authorization Sanctioned',
+        description: 'National Health Authority electronic gateway approved ₹1,20,000 package.',
+        timestamp: '2026-08-10 03:45 PM',
+        status: 'completed'
+      },
+      {
+        step: '4',
+        title: 'Procedure Completed & Discharge Summary Signed',
+        description: 'Stent implant serial numbers and cardiac discharge report submitted to portal.',
+        timestamp: '2026-08-14 11:30 AM',
+        status: 'completed'
+      },
+      {
+        step: '5',
+        title: 'Cashless Claim Settled & Disbursed',
+        description: 'Payment settled directly to hospital account. Zero balance owed by family.',
+        timestamp: '2026-08-15 11:00 AM',
+        status: 'completed'
+      }
+    ],
+    documents: [
+      { name: 'PM-JAY Cashless Voucher.pdf', type: 'Voucher', date: '2026-08-10', fileSize: '850 KB' },
+      { name: 'AIIMS Angioplasty Operative Note.pdf', type: 'Clinical Record', date: '2026-08-14', fileSize: '1.9 MB' },
+      { name: 'Final Zero-Balance Settlement Receipt.pdf', type: 'Receipt', date: '2026-08-15', fileSize: '640 KB' }
+    ]
+  }
+];
+
